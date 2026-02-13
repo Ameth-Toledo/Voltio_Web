@@ -27,7 +27,7 @@ jobs:
         NODE_ENV: production
         
     - name: Install dependencies
-      run: npm ci
+      run: npm install --legacy-peer-deps
       
     - name: Run linter
       run: npm run lint
@@ -52,7 +52,7 @@ jobs:
         NODE_ENV: production
         
     - name: Install dependencies
-      run: npm ci
+      run: npm install --legacy-peer-deps
       
     - name: Build production
       run: npm run build
