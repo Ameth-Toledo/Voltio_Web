@@ -1,5 +1,7 @@
 ```markdown
-# <img src="https://raw.githubusercontent.com/Ameth-Toledo/Voltio_Web/main/public/assets/voltio.png" width="30" alt="Voltio" /> Voltio
+![Voltio](https://raw.githubusercontent.com/Ameth-Toledo/Voltio_Web/main/public/assets/voltio.png)
+
+# Voltio
 
 ## 📋 Tabla de Contenidos
 
