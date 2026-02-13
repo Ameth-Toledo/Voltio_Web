@@ -1,7 +1,5 @@
 ```markdown
-![Voltio](https://raw.githubusercontent.com/Ameth-Toledo/Voltio_Web/main/public/assets/voltio.png)
-
-# Voltio
+# ⚡ Voltio
 
 ## 📋 Tabla de Contenidos
 
