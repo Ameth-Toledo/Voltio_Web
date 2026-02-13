@@ -1,0 +1,6 @@
+{
+    "buildCommand": "node create-env.js && npm run build",
+    "outputDirectory": "dist/estsoftware-oficial/browser",
+    "framework": null,
+    "installCommand": "npm ci"
+}
