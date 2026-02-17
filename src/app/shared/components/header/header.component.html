@@ -1,15 +1,118 @@
-<header class="bg-[#CCDAFF] px-6 py-4 shadow-sm">
-  <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <img src="assets/voltio.svg" alt="Voltio" class="h-10 w-10">
-      <span class="text-3xl font-bold text-gray-800" style="font-family: 'Agdasima', sans-serif;">
-        Voltio
-      </span>
+<header class="fixed inset-x-0 top-0 z-50 w-full flex justify-center pt-2 md:pt-6 px-2 md:px-0">
+  <nav
+    #headerNav
+    class="relative flex items-center justify-between bg-white px-4 md:px-6 py-3 md:py-4 transition-all duration-500 ease-out w-full"
+    [ngStyle]="navStyles"
+  >
+    <a
+      routerLink="/"
+      (click)="handleNavClick()"
+      class="relative z-20 flex items-center space-x-3 px-2 py-1 text-base font-medium text-black"
+    >
+      <img
+        src="assets/voltio.svg"
+        alt="Voltio"
+        width="40"
+        height="40"
+        class="w-8 h-8 md:w-10 md:h-10">
+      <span class="text-2xl font-bold text-black hidden sm:inline" style="font-family: 'Agdasima', sans-serif;">Voltio</span>
+    </a>
+
+    <div class="hidden lg:flex absolute inset-0 flex-1 items-center justify-center space-x-3">
+      <a
+        routerLink="/"
+        class="relative px-5 py-2.5 transition-all text-base font-medium"
+        [ngClass]="isActive('/') ? 'text-black' : 'text-neutral-600 hover:text-black'"
+        [class.rounded-full]="visible"
+        [class.rounded-lg]="!visible"
+      >
+        <span *ngIf="isActive('/')" class="absolute inset-0 h-full w-full bg-gray-100" [class.rounded-full]="visible" [class.rounded-lg]="!visible"></span>
+        <span class="relative z-20">Inicio</span>
+      </a>
+
+      <a
+        routerLink="/precios"
+        class="relative px-5 py-2.5 transition-all text-base font-medium"
+        [ngClass]="isActive('/precios') ? 'text-black' : 'text-neutral-600 hover:text-black'"
+        [class.rounded-full]="visible"
+        [class.rounded-lg]="!visible"
+      >
+        <span *ngIf="isActive('/precios')" class="absolute inset-0 h-full w-full bg-gray-100" [class.rounded-full]="visible" [class.rounded-lg]="!visible"></span>
+        <span class="relative z-20">Precios</span>
+      </a>
     </div>
 
-    <button class="flex items-center gap-2 bg-[#8D8BFB] hover:bg-[#4A6EEE] text-white font-medium px-6 py-2.5 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
-      <span>Iniciar ahora</span>
-      <lucide-icon [img]="ArrowRight" [size]="20"></lucide-icon>
-    </button>
-  </div>
+    <div class="hidden md:block relative z-20">
+      <button 
+        class="flex items-center gap-2 bg-black hover:bg-gray-800 text-white font-medium px-7 py-3 transition-all duration-200 shadow-md hover:shadow-lg"
+        [class.rounded-full]="visible"
+        [class.rounded-lg]="!visible"
+      >
+        <span>Iniciar ahora</span>
+        <lucide-icon [img]="ArrowRight" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-3 lg:hidden relative z-20">
+      <button
+        (click)="toggleMobileSearch()"
+        class="md:hidden p-2.5 rounded-full hover:bg-gray-100 transition-colors"
+        aria-label="Abrir búsqueda"
+      >
+        <lucide-icon [img]="Search" [size]="22" class="text-gray-700"></lucide-icon>
+      </button>
+
+      <button
+        (click)="toggleMobileMenu()"
+        class="lg:hidden p-2.5 rounded-full hover:bg-gray-100 transition-colors"
+      >
+        <lucide-icon *ngIf="!mobileMenuOpen" [img]="Menu" [size]="26" class="text-gray-700"></lucide-icon>
+        <lucide-icon *ngIf="mobileMenuOpen" [img]="X" [size]="26" class="text-gray-700"></lucide-icon>
+      </button>
+    </div>
+
+    <div *ngIf="mobileSearchOpen" class="md:hidden absolute top-full left-0 right-0 mt-2 p-4 bg-white rounded-2xl shadow-lg">
+      <form (submit)="handleSearch($event)">
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            name="search"
+            placeholder="Buscar..."
+            aria-label="Buscar"
+            class="w-full px-5 py-3.5 pr-12 rounded-full bg-gray-100 text-base text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2" aria-label="Buscar">
+            <lucide-icon [img]="Search" [size]="22" class="text-gray-500"></lucide-icon>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div *ngIf="mobileMenuOpen" class="lg:hidden absolute top-full left-0 right-0 mt-2 p-4 bg-white rounded-2xl shadow-lg">
+      <nav class="flex flex-col space-y-2">
+        <a
+          routerLink="/"
+          (click)="handleNavClick()"
+          class="px-5 py-3.5 rounded-full text-base font-medium transition-all"
+          [ngClass]="isActive('/') ? 'bg-gray-100 text-black' : 'text-neutral-600 hover:bg-gray-50'"
+        >
+          Inicio
+        </a>
+        <a
+          routerLink="/precios"
+          (click)="handleNavClick()"
+          class="px-5 py-3.5 rounded-full text-base font-medium transition-all"
+          [ngClass]="isActive('/precios') ? 'bg-gray-100 text-black' : 'text-neutral-600 hover:bg-gray-50'"
+        >
+          Precios
+        </a>
+        <button
+          (click)="handleNavClick()"
+          class="px-5 py-3.5 rounded-lg text-base font-medium transition-all text-left bg-black text-white hover:bg-gray-800"
+        >
+          Iniciar ahora
+        </button>
+      </nav>
+    </div>
+  </nav>
 </header>
