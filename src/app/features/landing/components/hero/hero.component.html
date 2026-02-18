@@ -1,1 +1,43 @@
-<p>hero works!</p>
+<section class="pt-20 md:pt-32 min-h-screen bg-gradient-to-b from-[#CCDAFF] to-white pb-12 lg:pb-20 px-6 relative overflow-hidden">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start relative z-10">
+    <div class="space-y-6 lg:space-y-8 pt-8 lg:pt-16">
+      <h1 #heroTitle class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+        <span style="font-family: 'Agdasima', sans-serif;" class="text-6xl sm:text-7xl lg:text-8xl">Voltio</span>, tu marketplace de electrónica
+      </h1>
+
+      <p #heroDescription class="text-lg sm:text-xl text-gray-600 max-w-xl">
+        Descubre componentes, sensores, microcontroladores y todo lo que necesitas 
+        para tus proyectos. Múltiples tiendas en un solo lugar.
+      </p>
+
+      <div #heroComponents class="flex items-center gap-4">
+        <img src="assets/hardware/esp32.webp" alt="ESP32" class="w-16 h-16 object-contain opacity-60">
+        <img src="assets/hardware/arduino.webp" alt="Arduino" class="w-16 h-16 object-contain opacity-60">
+        <img src="assets/hardware/capacitor.webp" alt="Capacitor" class="w-16 h-16 object-contain opacity-60">
+        <img src="assets/hardware/cautin.webp" alt="Cautín" class="w-16 h-16 object-contain opacity-60">
+      </div>
+
+      <div #heroCta>
+        <a href="#" class="inline-block hover:scale-105 transition-transform duration-200">
+          <img 
+            src="assets/android/playstore.webp" 
+            alt="Disponible en Google Play" 
+            class="h-14 sm:h-16 w-auto">
+        </a>
+      </div>
+    </div>
+
+    <div #heroPhone class="flex justify-center lg:justify-end relative">
+      <img src="assets/hardware/leds.webp" alt="" class="absolute bottom-32 left-4 w-18 h-18 object-contain opacity-45 rotate-45 animate-float hidden lg:block">
+      
+      <div class="w-full max-w-sm lg:max-w-md relative z-10">
+        <app-android 
+          [src]="mockupImage"
+          [width]="433"
+          [height]="882"
+          className="w-full h-auto drop-shadow-2xl"
+        ></app-android>
+      </div>
+    </div>
+  </div>
+</section>
