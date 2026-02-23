@@ -1,0 +1,106 @@
+<!-- Logo centrado encima del formulario -->
+<div class="voltio-form-logo">
+  <a routerLink="/" class="voltio-logo-link">
+    <img src="assets/voltio.svg" alt="Voltio" class="voltio-logo-img voltio-logo-img--lg" />
+    <span class="voltio-logo-text voltio-logo-text--lg">Voltio</span>
+  </a>
+</div>
+
+<!-- Formulario -->
+<form
+  [formGroup]="loginForm"
+  (ngSubmit)="onSubmit()"
+  class="voltio-form"
+  novalidate
+>
+  <!-- EMAIL -->
+  <div class="voltio-field">
+    <label class="voltio-label" for="email">Correo electrónico</label>
+    <input
+      id="email"
+      type="email"
+      formControlName="email"
+      class="voltio-input"
+      [class.voltio-input--error]="email.invalid && email.touched"
+      placeholder="correo@ejemplo.com"
+      autocomplete="email"
+    />
+    @if (email.touched && email.errors) {
+      <p class="voltio-error-msg">
+        @if (email.errors['required']) { El correo es requerido. }
+        @else if (email.errors['email']) { Introduce un correo válido. }
+      </p>
+    }
+  </div>
+
+  <!-- PASSWORD -->
+  <div class="voltio-field">
+    <label class="voltio-label" for="password">Contraseña</label>
+    <div class="voltio-input-wrap">
+      <input
+        id="password"
+        [type]="showPassword() ? 'text' : 'password'"
+        formControlName="password"
+        class="voltio-input voltio-input--pass"
+        [class.voltio-input--error]="password.invalid && password.touched"
+        placeholder="••••••••"
+        autocomplete="current-password"
+      />
+      <button
+        type="button"
+        class="voltio-eye-btn"
+        (click)="togglePasswordVisibility()"
+        [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+      >
+        @if (showPassword()) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        }
+      </button>
+    </div>
+    @if (password.touched && password.errors) {
+      <p class="voltio-error-msg">
+        @if (password.errors['required']) { La contraseña es requerida. }
+        @else if (password.errors['minLength']) { Mínimo 6 caracteres. }
+        @else if (password.errors['noUpperCase']) { Debe contener al menos una mayúscula. }
+      </p>
+    }
+  </div>
+
+  <!-- ERROR GLOBAL -->
+  @if (errorMessage()) {
+    <div class="voltio-alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- SUBMIT -->
+  <button
+    type="submit"
+    class="voltio-btn voltio-btn--primary"
+    [disabled]="isLoading()"
+  >
+    @if (isLoading()) {
+      <span class="voltio-spinner"></span>
+      Iniciando sesión...
+    } @else {
+      Iniciar sesión
+    }
+  </button>
+</form>

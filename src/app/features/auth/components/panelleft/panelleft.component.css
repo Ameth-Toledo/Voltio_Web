@@ -1,0 +1,61 @@
+.voltio-panel--left {
+  background: #dde8f8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .voltio-panel--left {
+    display: none;
+  }
+}
+
+.voltio-panel__tagline {
+  position: absolute;
+  top: 8rem;
+  left: 2.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.65;
+  max-width: 320px;
+  white-space: normal;
+}
+
+.voltio-panel__illustration {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 10rem;
+  padding-left: 1rem;
+}
+
+.voltio-illustration-img {
+  width: 520px;
+  max-width: 95%;
+  object-fit: contain;
+}
+
+/* ── Animación de entrada de la ilustración ── */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.voltio-illustration-img {
+  width: 520px;
+  max-width: 95%;
+  object-fit: contain;
+  animation: slideUpFade 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.2s;
+}

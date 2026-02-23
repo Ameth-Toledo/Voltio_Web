@@ -1,0 +1,58 @@
+.voltio-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+}
+
+.voltio-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.voltio-logo-img {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+.voltio-logo-text {
+  font-family: 'Agdasima', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1;
+}
+
+.voltio-btn--register {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #111827;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  letter-spacing: 0.01em;
+}
+
+.voltio-btn--register:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+}
+
+.voltio-btn__arrow {
+  font-size: 1rem;
+  line-height: 1;
+}

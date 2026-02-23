@@ -1,0 +1,32 @@
+<div class="voltio-login-page">
+
+  <app-topbar />
+
+  <main class="voltio-split">
+
+    <app-panelleft />
+
+    <section class="voltio-panel voltio-panel--right">
+
+      <img
+        src="assets/hardware/leds.webp"
+        alt=""
+        aria-hidden="true"
+        class="voltio-leds-decoration"
+      />
+
+      <app-form
+        [isLoading]="isLoading()"
+        [errorMessage]="errorMessage()"
+        (submitted)="onFormSubmit($event)"
+      />
+
+      <app-oauth
+        (googleLogin)="loginWithGoogle()"
+        (githubLogin)="loginWithGithub()"
+      />
+
+    </section>
+  </main>
+
+</div>

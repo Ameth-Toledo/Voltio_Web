@@ -1,0 +1,57 @@
+.voltio-login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background: #dde8f8;
+  overflow: hidden;
+}
+
+.voltio-split {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .voltio-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.voltio-panel--right {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  padding: 5rem 4rem 3rem;
+  gap: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 30% 0 0 30% / 50% 0 0 50%;
+  z-index: 1;
+}
+
+.voltio-leds-decoration {
+  position: absolute;
+  bottom: -5rem;
+  right: -1rem;
+  width: 300px;
+  object-fit: contain;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .voltio-panel--right {
+    padding: 4rem 1.5rem 2rem;
+    border-radius: 0;
+  }
+  .voltio-leds-decoration {
+    width: 160px;
+    bottom: -3rem;
+    opacity: 0.2;
+  }
+}

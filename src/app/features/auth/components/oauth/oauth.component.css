@@ -1,0 +1,62 @@
+.voltio-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #9ca3af;
+  font-size: 0.8125rem;
+  z-index: 2;
+}
+
+.voltio-divider::before,
+.voltio-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.voltio-oauth-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+  z-index: 2;
+}
+
+.voltio-btn--oauth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.625rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.voltio-btn--oauth:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.voltio-btn--google {
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  color: #374151;
+}
+
+.voltio-btn--github {
+  background: #111827;
+  border: 1.5px solid #111827;
+  color: #ffffff;
+}
+
+@media (max-width: 480px) {
+  .voltio-oauth-row {
+    grid-template-columns: 1fr;
+  }
+}
