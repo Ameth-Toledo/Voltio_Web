@@ -31,6 +31,16 @@
       </a>
 
       <a
+        routerLink="/"
+        fragment="categorias"
+        class="relative px-5 py-2.5 transition-all text-base font-medium text-neutral-600 hover:text-black"
+        [class.rounded-full]="visible"
+        [class.rounded-lg]="!visible"
+      >
+        <span class="relative z-20">Categorías</span>
+      </a>
+
+      <a
         routerLink="/precios"
         class="relative px-5 py-2.5 transition-all text-base font-medium"
         [ngClass]="isActive('/precios') ? 'text-black' : 'text-neutral-600 hover:text-black'"
@@ -97,6 +107,14 @@
           [ngClass]="isActive('/') ? 'bg-gray-100 text-black' : 'text-neutral-600 hover:bg-gray-50'"
         >
           Inicio
+        </a>
+        <a
+          routerLink="/"
+          fragment="categorias"
+          (click)="handleNavClick()"
+          class="px-5 py-3.5 rounded-full text-base font-medium transition-all text-neutral-600 hover:bg-gray-50"
+        >
+          Categorías
         </a>
         <a
           routerLink="/precios"
