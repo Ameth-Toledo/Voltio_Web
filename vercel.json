@@ -1,6 +1,6 @@
 {
     "buildCommand": "node create-env.js && npm run build",
-    "outputDirectory": "dist/estsoftware-oficial/browser",
+    "outputDirectory": "dist/voltio/browser",
     "framework": null,
     "installCommand": "npm ci"
 }
