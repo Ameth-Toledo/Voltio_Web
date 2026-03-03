@@ -1,0 +1,51 @@
+<section #sectionRef id="categorias" class="relative overflow-hidden py-20 px-6 bg-black antialiased">
+  <div class="pointer-events-none absolute inset-0 select-none [background-size:40px_40px] [background-image:linear-gradient(to_right,#171717_1px,transparent_1px),linear-gradient(to_bottom,#171717_1px,transparent_1px)]"></div>
+  <app-spotlight className="-top-40 left-0 md:-top-20 md:left-60" fill="white" [isVisible]="isVisible"></app-spotlight>
+
+  <div class="relative z-10 max-w-4xl mx-auto mb-10">
+    <span class="inline-block mb-3 px-4 py-1 rounded-full border border-gray-700 text-gray-400 text-sm tracking-widest uppercase">
+      Categorías
+    </span>
+    <h2 class="text-4xl md:text-5xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent leading-tight mb-6">
+      Todo lo que necesitas
+    </h2>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-t border-gray-800 pt-6">
+      <p class="text-base text-gray-500">
+        Encuentra los mejores componentes electrónicos en un solo lugar
+      </p>  
+    </div>
+  </div>
+
+  <div class="relative z-10 mx-auto grid max-w-4xl grid-cols-1 gap-4 md:auto-rows-[20rem] md:grid-cols-3">
+    @for (item of items; track item.title) {
+
+      @if (item.banner) {
+        <div class="group/bento row-span-1 flex flex-col justify-between rounded-2xl border border-gray-800 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-gray-600 hover:scale-[1.02] relative"
+             [class]="item.colSpan">
+          <img [src]="item.banner" [alt]="item.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/bento:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+          <div class="relative z-10 mt-auto p-5 transition duration-200 group-hover/bento:translate-x-2">
+            <div class="flex items-center gap-2 mb-2">
+              <img src="assets/voltio.png" alt="Voltio logo" class="w-4 h-4 object-contain opacity-80">
+              <span style="font-family: 'Agdasima', sans-serif;" class="text-gray-300 text-base tracking-wide">Voltio</span>
+            </div>
+            <div class="font-bold text-lg text-white mb-1">{{ item.title }}</div>
+            <div class="text-sm leading-relaxed" [class]="item.descriptionColor">{{ item.description }}</div>
+          </div>
+        </div>
+      } @else {
+        <div class="group/bento row-span-1 flex flex-col justify-between space-y-4 rounded-2xl border border-gray-800 bg-black p-6 transition-all duration-300 hover:shadow-2xl hover:border-gray-600 hover:scale-[1.02]"
+             [class]="item.colSpan">
+          <div class="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-800 relative overflow-hidden">
+            <div class="absolute inset-0 [background-size:20px_20px] [background-image:linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)]"></div>
+          </div>
+          <div class="transition duration-200 group-hover/bento:translate-x-2">
+            <div class="mt-2 mb-2 font-bold text-lg text-white">{{ item.title }}</div>
+            <div class="text-sm leading-relaxed" [class]="item.descriptionColor">{{ item.description }}</div>
+          </div>
+        </div>
+      }
+
+    }
+  </div>
+</section>
