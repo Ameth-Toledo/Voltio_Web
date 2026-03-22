@@ -39,3 +39,30 @@
   animation: float-delayed 7s ease-in-out infinite;
   animation-delay: 1s;
 }
+
+@keyframes glitch {
+  0%, 90%, 100% { 
+    transform: translate(0); 
+    text-shadow: none;
+  }
+  91% { 
+    transform: translate(-2px, 1px); 
+    text-shadow: 2px 0 #CCDAFF;
+  }
+  93% { 
+    transform: translate(2px, -1px); 
+    text-shadow: -2px 0 #4A6CF7;
+  }
+  95% { 
+    transform: translate(-1px, 2px); 
+    text-shadow: 2px 0 #CCDAFF;
+  }
+  97% { 
+    transform: translate(1px, -1px); 
+    text-shadow: -2px 0 #4A6CF7;
+  }
+}
+
+.voltio-electric {
+  animation: glitch 2.5s infinite;
+}
