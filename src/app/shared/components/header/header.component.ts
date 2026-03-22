@@ -92,4 +92,9 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.routerSubscription?.unsubscribe();
   }
+
+  sendToLogin(event: Event) {
+    event.preventDefault();
+    this.router.navigate(['login'])
+  }
 }

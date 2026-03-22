@@ -1,8 +1,12 @@
 <section class="pt-20 md:pt-32 min-h-screen bg-gradient-to-b from-[#CCDAFF] to-white pb-12 lg:pb-20 px-6 relative overflow-hidden">
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start relative z-10">
     <div class="space-y-6 lg:space-y-8 pt-8 lg:pt-16">
-      <h1 #heroTitle class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
-        <span style="font-family: 'Agdasima', sans-serif;" class="text-6xl sm:text-7xl lg:text-8xl">Voltio</span>, tu marketplace de electrónica
+      <h1 #heroTitle class="text-[3.5rem] sm:text-6xl lg:text-[5rem] font-bold text-gray-900 leading-tight">
+        <span 
+          style="font-family: 'Agdasima', sans-serif;" 
+          class="voltio-electric text-6xl sm:text-7xl lg:text-8xl inline-block">
+          VOLTIO
+        </span>, TU MARKETPLACE<br>DE&nbsp;ELECTRÓNICA
       </h1>
 
       <p #heroDescription class="text-lg sm:text-xl text-gray-600 max-w-xl">
@@ -10,20 +14,36 @@
         para tus proyectos. Múltiples tiendas en un solo lugar.
       </p>
 
-      <!--<div #heroComponents class="flex items-center gap-4">
-        <img src="assets/hardware/esp32.webp" alt="ESP32" class="w-16 h-16 object-contain opacity-60">
-        <img src="assets/hardware/arduino.webp" alt="Arduino" class="w-16 h-16 object-contain opacity-60">
-        <img src="assets/hardware/capacitor.webp" alt="Capacitor" class="w-16 h-16 object-contain opacity-60">
-        <img src="assets/hardware/cautin.webp" alt="Cautín" class="w-16 h-16 object-contain opacity-60">
-      </div>-->
+      <div class="flex flex-col gap-0 w-full">
+        <div #heroCta class="flex items-center gap-4">
+          <div class="relative inline-block group cursor-not-allowed">
+            <img 
+              src="assets/android/playstore.webp" 
+              alt="Próximamente en Google Play" 
+              class="h-14 sm:h-16 w-auto grayscale opacity-50 select-none pointer-events-none">
+            
+            <span class="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              Próximamente
+            </span>
+          </div>
 
-      <div #heroCta>
-        <a href="#" class="inline-block hover:scale-105 transition-transform duration-200">
-          <img 
-            src="assets/android/playstore.webp" 
-            alt="Disponible en Google Play" 
-            class="h-14 sm:h-16 w-auto">
-        </a>
+          <div class="relative inline-block group cursor-not-allowed">
+            <img 
+              src="assets/android/app_store.png" 
+              alt="Próximamente en App Store" 
+              class="h-14 sm:h-16 w-auto grayscale opacity-50 select-none pointer-events-none">
+            
+            <span class="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              Próximamente
+            </span>
+          </div>
+        </div>
+
+        <img 
+          src="assets/resources/electronic.gif" 
+          alt="Electrónica" 
+          class="w-full h-auto opacity-80"
+          style="transform: translateY(-140px) scaleX(1.5);">
       </div>
     </div>
 

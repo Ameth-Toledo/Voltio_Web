@@ -1,41 +1,39 @@
 <div class="min-h-screen bg-[#CFDAFF] flex flex-col">
   <div class="w-full flex-1 flex flex-col relative overflow-hidden">
 
-    <div class="absolute left-0 top-0 h-full w-[52%] bg-white rounded-r-full z-10"></div>
+    <div class="absolute right-0 top-0 h-full w-[52%] bg-white rounded-l-full z-10"></div>
 
-    <div class="absolute -bottom-48 -left-52" style="z-index: 15;">
-      <img src="assets/hardware/leds.webp" alt="" class="w-[32rem] object-contain opacity-40 scale-x-[-1]" />
+    <div class="absolute -bottom-48 -right-52" style="z-index: 15;">
+      <img src="assets/hardware/leds.webp" alt="" class="w-[32rem] object-contain opacity-40" />
     </div>
 
     <div class="relative z-30 w-full flex items-center justify-between px-8 pt-8 pb-4">
       <div class="flex items-center gap-3">
-        <img src="assets/voltio.png" alt="Voltio" class="h-10 w-10 object-contain cursor-pointer" (click)="sendToHome($event)"/>
+        <img src="assets/voltio.png" alt="Voltio" class="h-10 w-10 object-contain cursor-pointer" (click)="sendToHome($event)" />
         <div class="text-3xl font-semibold" style="font-family: 'Agdasima', sans-serif;">Voltio</div>
       </div>
-      <button type="button" [routerLink]="'/login'"
+      <button type="button" [routerLink]="'/register'"
         class="inline-flex items-center gap-3 rounded-full bg-black text-white px-6 py-3 text-sm font-medium hover:bg-gray-800 transition-colors">
-        Iniciar sesión <span aria-hidden="true">→</span>
+        Registrarme ahora <span aria-hidden="true">→</span>
       </button>
     </div>
 
     <div class="flex flex-1">
+
+      <div class="relative z-10 flex-1 flex flex-col items-start justify-center px-16 pb-10">
+        <p class="text-base text-gray-700 mb-8">
+          Bienvenido de vuelta<br />
+          Tu marketplace de electrónica, todo en un solo lugar.
+        </p>
+        <img src="assets/login.webp" alt="Login illustration" class="w-full max-w-lg object-contain" />
+      </div>
+
       <div class="relative z-30 w-1/2 flex items-center justify-center px-10 pb-6 overflow-y-auto">
         <div class="w-full max-w-md">
-          <h1 class="text-3xl font-semibold mb-4">¡Bienvenido a Voltio!</h1>
+          <h1 class="text-3xl font-semibold mb-2">¡Bienvenido de vuelta!</h1>
+          <p class="text-sm text-gray-500 mb-6">Ingresa tus credenciales para continuar.</p>
 
           <form [formGroup]="form" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre(s)</label>
-              <input class="w-full rounded-xl border border-gray-200 px-4 py-2.5 outline-none focus:border-gray-300"
-                type="text" formControlName="firstName" placeholder="Ameth de Jesus" />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Apellido(s)</label>
-              <input class="w-full rounded-xl border border-gray-200 px-4 py-2.5 outline-none focus:border-gray-300"
-                type="text" formControlName="lastName" placeholder="Mendez Toledo" />
-            </div>
-
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
               <input class="w-full rounded-xl border border-gray-200 px-4 py-2.5 outline-none focus:border-gray-300"
@@ -45,11 +43,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="text-sm font-medium text-gray-700">Contraseña</label>
-                <div class="w-32 h-2 rounded-full bg-gray-200 overflow-hidden">
-                  <div class="h-2 rounded-full transition-all duration-300" [style.width]="passwordStrength.width"
-                    [ngClass]="passwordStrength.color">
-                  </div>
-                </div>
+                <a href="#" class="text-xs text-gray-500 hover:text-black transition-colors">¿Olvidaste tu contraseña?</a>
               </div>
               <div class="relative">
                 <input class="w-full rounded-xl border border-gray-200 px-4 py-2.5 pr-12 outline-none focus:border-gray-300"
@@ -64,7 +58,7 @@
             <div>
               <div class="flex items-center gap-3 mb-3">
                 <div class="flex-1 h-px bg-gray-200"></div>
-                <p class="text-xs text-gray-500 whitespace-nowrap">o regístrate con</p>
+                <p class="text-xs text-gray-500 whitespace-nowrap">o inicia sesión con</p>
                 <div class="flex-1 h-px bg-gray-200"></div>
               </div>
               <div class="flex items-center gap-4">
@@ -84,25 +78,13 @@
 
             <button type="submit"
               class="w-full rounded-xl bg-black text-white px-4 py-2.5 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors">
-              <lucide-icon [img]="UserPlus" size="18"></lucide-icon>
-              Crear cuenta
+              <lucide-icon [img]="LogIn" size="18"></lucide-icon>
+              Iniciar sesión
             </button>
           </form>
         </div>
       </div>
 
-      <div class="relative z-10 flex-1 flex flex-col items-start justify-center px-16 pb-10">
-        <div class="flex items-center gap-3 mb-3">
-          <img src="assets/voltio.png" alt="Voltio" class="h-16 w-16 object-contain" />
-          <div class="text-5xl font-semibold text-gray-900" style="font-family: 'Agdasima', sans-serif;">Voltio</div>
-        </div>
-        <p class="text-base text-gray-700 mb-8">
-          Gracias por confiar en Voltio<br />
-          Tu marketplace de electrónica, todo en un solo lugar.
-        </p>
-        <img src="assets/register.webp" alt="Register illustration" class="w-full max-w-lg object-contain" />
-      </div>
     </div>
-
   </div>
 </div>
