@@ -1,0 +1,6 @@
+#profile-map {
+  height: 400px;
+  width: 100% !important;
+  display: block;
+  z-index: 0;
+}
