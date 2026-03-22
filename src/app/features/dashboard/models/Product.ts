@@ -1,6 +1,12 @@
 export interface Product {
-  imgSrc: string;
-  name: string;
-  category: string;
-  rating: string;
+  id_producto: number;
+  sku: string;
+  nombre: string;
+  descripcion?: string;
+  precio_venta: number;
+  stock_actual: number;
+  imagen_url: string;
+  id_categoria?: number;
+  categoria?: string;
+  fecha_registro: string;
 }

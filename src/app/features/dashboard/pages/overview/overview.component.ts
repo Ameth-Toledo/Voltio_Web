@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from "../../components/navbar/navbar.component";
 import { LucideAngularModule, Plus, Star, TrendingUp, Package, ShoppingCart } from 'lucide-angular';
 import { ProductCardComponent } from "../../components/product-card/product-card.component";
-import { Product } from '../../models/Product';
+import { ProductCard } from '../../models/ProductCard';
 
 @Component({
   selector: 'app-overview',
@@ -21,7 +21,7 @@ export class OverviewComponent {
   readonly Package = Package;
   readonly ShoppingCart = ShoppingCart;
 
-  products: Product[] = [
+  products: ProductCard[] = [
     { imgSrc: 'assets/hardware/esp32.webp', name: 'ESP32 DevKit v1', category: 'Microcontroladores', rating: '4.8' },
     { imgSrc: 'assets/hardware/arduino.webp', name: 'Arduino Uno R3', category: 'Microcontroladores', rating: '4.9' },
     { imgSrc: 'assets/hardware/esp32.webp', name: 'Sensor DHT22 Temperatura y Humedad', category: 'Sensores', rating: '4.7' },
