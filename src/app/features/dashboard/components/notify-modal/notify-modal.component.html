@@ -1,0 +1,90 @@
+<!-- Overlay -->
+<div 
+  *ngIf="isOpen"
+  class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+  (click)="close()">
+</div>
+
+<!-- Notifications Sidebar -->
+<div 
+  class="fixed top-0 right-0 h-full w-full md:w-[420px] z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto"
+  style="background-color: #CCDAFF;"
+  [ngClass]="{
+    'translate-x-full': !isOpen,
+    'translate-x-0': isOpen
+  }">
+  
+  <div class="h-full flex flex-col">
+    <div class="flex items-center justify-between p-6 border-b border-blue-200">
+      <div class="flex items-center gap-3">
+        <button 
+          (click)="close()"
+          class="p-1 hover:bg-white hover:bg-opacity-50 rounded-lg transition-colors">
+          <lucide-icon [img]="ArrowLeft" [size]="20" class="text-gray-700"></lucide-icon>
+        </button>
+        <h2 class="text-lg font-semibold text-gray-900">Notificaciones</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="p-2 hover:bg-white hover:bg-opacity-50 rounded-lg transition-colors">
+          <lucide-icon [img]="CheckCheck" [size]="20" class="text-gray-700"></lucide-icon>
+        </button>
+        <button class="p-2 hover:bg-white hover:bg-opacity-50 rounded-lg transition-colors">
+          <lucide-icon [img]="Settings" [size]="20" class="text-gray-700"></lucide-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 px-6 py-4 border-b border-blue-200">
+      <button 
+        *ngFor="let filter of filters"
+        (click)="activeFilter = filter.id"
+        class="px-4 py-1.5 text-sm rounded-full transition-colors"
+        [ngClass]="{
+          'bg-gray-900 text-white': activeFilter === filter.id,
+          'text-gray-700 hover:bg-white hover:bg-opacity-50': activeFilter !== filter.id
+        }">
+        {{ filter.label }}
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+      <div *ngFor="let notification of notifications" class="border-b border-blue-200">
+        <div class="p-6 hover:bg-white hover:bg-opacity-40 transition-colors cursor-pointer">
+          <div class="flex items-start gap-4">
+            <div class="shrink-0">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                [ngClass]="{
+                  'bg-green-500/20': notification.type === 'success',
+                  'bg-blue-500/20': notification.type === 'info',
+                  'bg-yellow-500/20': notification.type === 'warning',
+                  'bg-red-500/20': notification.type === 'error'
+                }">
+                <lucide-icon *ngIf="notification.type === 'info'" [img]="Info" [size]="20" class="text-blue-500"></lucide-icon>
+                <lucide-icon *ngIf="notification.type === 'success'" [img]="CheckCircle" [size]="20" class="text-green-500"></lucide-icon>
+                <lucide-icon *ngIf="notification.type === 'warning'" [img]="AlertTriangle" [size]="20" class="text-yellow-500"></lucide-icon>
+                <lucide-icon *ngIf="notification.type === 'error'" [img]="XCircle" [size]="20" class="text-red-500"></lucide-icon>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <span *ngIf="notification.isNew" class="inline-block px-2 py-0.5 text-xs font-semibold rounded-md mb-2" style="background-color: #22C55E; color: #000;">
+                    NUEVO
+                  </span>
+                  <h3 class="text-gray-900 font-normal text-sm">{{ notification.title }}</h3>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm mb-2">{{ notification.message }}</p>
+              <span class="text-xs text-gray-500">{{ notification.time }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="notifications.length === 0" class="flex flex-col items-center justify-center h-full py-12">
+        <lucide-icon [img]="BellOff" [size]="48" class="text-gray-400 mb-4"></lucide-icon>
+        <p class="text-gray-600">No tienes notificaciones</p>
+      </div>
+    </div>
+  </div>
+</div>

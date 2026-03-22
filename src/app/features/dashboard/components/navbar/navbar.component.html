@@ -1,0 +1,67 @@
+<header class="sticky top-0 z-40 flex items-center justify-between mb-6 py-4 pb-4 border-b border-gray-200 w-full bg-white">
+  <div>
+    <h1 class="text-xl font-bold text-gray-900">{{ pageTitle }}</h1>
+    <p *ngIf="pageSubtitle" class="text-sm text-gray-500 mt-0.5">{{ pageSubtitle }}</p>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <button 
+      (click)="toggleNotifications()"
+      class="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+      <lucide-icon [img]="Bell" [size]="24" class="text-gray-600"></lucide-icon>
+      <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+    </button>
+
+    <div class="relative dropdown-container">
+      <button 
+        (click)="toggleDropdown()"
+        class="flex items-center gap-2 hover:bg-gray-100 rounded-lg p-1.5 transition-colors">
+        <div class="w-10 h-10 rounded-full overflow-hidden" style="background-color: #CCDAFF;">
+          <img src="assets/ameth.png" alt="Profile" class="w-full h-full object-cover">
+        </div>
+        <lucide-icon 
+          [img]="ChevronDown" 
+          [size]="20" 
+          class="text-gray-600"
+          [ngClass]="{'rotate-180': isDropdownOpen}">
+        </lucide-icon>
+      </button>
+
+      <div 
+        *ngIf="isDropdownOpen"
+        class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+        <div class="px-4 py-3 border-b border-gray-100">
+          <p class="text-sm font-semibold text-gray-900">Ameth Toledo</p>
+          <p class="text-xs text-gray-500 mt-1">ameth&#64;example.com</p>
+        </div>
+
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+          <lucide-icon [img]="User" [size]="18" class="text-gray-500"></lucide-icon>
+          <span class="text-sm text-gray-700">Ver mi perfil</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+          <lucide-icon [img]="CreditCard" [size]="18" class="text-gray-500"></lucide-icon>
+          <span class="text-sm text-gray-700">Mi suscripción</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+          <lucide-icon [img]="Settings" [size]="18" class="text-gray-500"></lucide-icon>
+          <span class="text-sm text-gray-700">Configuración</span>
+        </a>
+
+        <div class="border-t border-gray-100 mt-2 pt-2">
+          <button class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">
+            <lucide-icon [img]="LogOut" [size]="18" class="text-red-400"></lucide-icon>
+            <span class="text-sm text-red-400">Cerrar sesión</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<app-notify-modal 
+  [isOpen]="isNotificationsOpen" 
+  (closeModal)="closeNotifications()">
+</app-notify-modal>

@@ -1,0 +1,43 @@
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.hover\:scale-\[1\.02\]:hover {
+  transform: scale(1.02);
+}
+
+.glow-effect::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid transparent;
+  background: linear-gradient(120deg, #dd7bbb 0%, #d79f1e 25%, #5a922c 50%, #4c7894 75%, #dd7bbb 100%);
+  background-attachment: fixed;
+  opacity: var(--active, 0);
+  transition: opacity 300ms;
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+  mask-image: linear-gradient(#0000, #0000),
+    conic-gradient(
+      from calc((var(--start, 0) - 40) * 1deg),
+      #00000000 0deg,
+      #fff,
+      #00000000 80deg
+    );
+}
