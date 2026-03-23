@@ -14,7 +14,6 @@ export class HeroComponent implements AfterViewInit {
 
   @ViewChild('heroTitle') heroTitle!: ElementRef;
   @ViewChild('heroDescription') heroDescription!: ElementRef;
-  @ViewChild('heroComponents') heroComponents!: ElementRef;
   @ViewChild('heroCta') heroCta!: ElementRef;
   @ViewChild('heroPhone') heroPhone!: ElementRef;
 
@@ -32,11 +31,6 @@ export class HeroComponent implements AfterViewInit {
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
         '-=0.4'
-      )
-      .fromTo(this.heroComponents.nativeElement.children,
-        { opacity: 0, scale: 0.8, y: 20 },
-        { opacity: 0.6, scale: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'back.out(1.7)' },
-        '-=0.3'
       )
       .fromTo(this.heroCta.nativeElement,
         { opacity: 0, scale: 0.9 },
