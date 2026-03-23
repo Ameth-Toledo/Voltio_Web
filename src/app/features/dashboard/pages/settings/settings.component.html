@@ -3,4 +3,184 @@
     pageTitle="CONFIGURACIÓN" 
     pageSubtitle="Panel de vendedor">
   </app-navbar>
+
+  <!-- Tabs header -->
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div class="flex border-b border-gray-100">
+      <button *ngFor="let section of sections"
+        (click)="activeSection = section.id"
+        class="flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors border-b-2 -mb-px"
+        [ngClass]="activeSection === section.id 
+          ? 'border-black text-black' 
+          : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'">
+        <lucide-angular [img]="section.icon" [size]="16"></lucide-angular>
+        {{ section.label }}
+      </button>
+    </div>
+
+    <!-- Cuenta -->
+    <div *ngIf="activeSection === 'cuenta'" class="p-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">Cuenta</h3>
+      <p class="text-sm text-gray-500 mb-6">Actualiza tu información de contacto.</p>
+      <div class="border-t border-gray-100 pt-6 space-y-5 max-w-lg">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Correo electrónico</label>
+          <input type="email" [(ngModel)]="account.email"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 transition-colors">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
+          <input type="tel" [(ngModel)]="account.phone"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 transition-colors">
+        </div>
+        <div class="pt-2">
+          <button (click)="saveAccount()"
+            class="px-6 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+            [ngClass]="savedAccount ? 'bg-green-500 text-white' : 'bg-black hover:bg-gray-800 text-white'">
+            <lucide-angular *ngIf="savedAccount" [img]="Check" [size]="16"></lucide-angular>
+            {{ savedAccount ? 'Guardado' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seguridad -->
+    <div *ngIf="activeSection === 'seguridad'" class="p-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">Seguridad</h3>
+      <p class="text-sm text-gray-500 mb-6">Cambia tu contraseña periódicamente para mayor seguridad.</p>
+      <div class="border-t border-gray-100 pt-6 space-y-5 max-w-lg">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Contraseña actual</label>
+          <div class="relative">
+            <input [type]="showCurrentPassword ? 'text' : 'password'" [(ngModel)]="password.current"
+              placeholder="••••••••"
+              class="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 transition-colors">
+            <button (click)="showCurrentPassword = !showCurrentPassword"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <lucide-angular [img]="showCurrentPassword ? EyeOff : Eye" [size]="16"></lucide-angular>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nueva contraseña</label>
+          <div class="relative">
+            <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="password.new"
+              placeholder="••••••••"
+              class="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 transition-colors">
+            <button (click)="showNewPassword = !showNewPassword"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <lucide-angular [img]="showNewPassword ? EyeOff : Eye" [size]="16"></lucide-angular>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirmar contraseña</label>
+          <div class="relative">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="password.confirm"
+              placeholder="••••••••"
+              class="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 transition-colors"
+              [ngClass]="password.confirm && password.new !== password.confirm ? 'border-red-300' : ''">
+            <button (click)="showConfirmPassword = !showConfirmPassword"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <lucide-angular [img]="showConfirmPassword ? EyeOff : Eye" [size]="16"></lucide-angular>
+            </button>
+          </div>
+          <p *ngIf="password.confirm && password.new !== password.confirm"
+            class="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
+        </div>
+        <div class="pt-2">
+          <button (click)="savePassword()"
+            [disabled]="!password.current || !password.new || password.new !== password.confirm"
+            class="px-6 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            [ngClass]="savedPassword ? 'bg-green-500 text-white' : 'bg-black hover:bg-gray-800 text-white'">
+            <lucide-angular *ngIf="savedPassword" [img]="Check" [size]="16"></lucide-angular>
+            {{ savedPassword ? 'Contraseña actualizada' : 'Cambiar contraseña' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direcciones -->
+    <div *ngIf="activeSection === 'direcciones'" class="p-8">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-lg font-semibold text-gray-900">Direcciones</h3>
+        <button (click)="showAddressForm = !showAddressForm"
+          class="flex items-center gap-1.5 px-3 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg text-xs font-medium transition-colors">
+          <lucide-angular [img]="Plus" [size]="14"></lucide-angular>
+          Agregar
+        </button>
+      </div>
+      <p class="text-sm text-gray-500 mb-6">Gestiona tus direcciones de envío.</p>
+      <div class="border-t border-gray-100 pt-6 space-y-4 max-w-lg">
+
+        <div *ngIf="showAddressForm" class="p-4 bg-gray-50 rounded-xl space-y-3">
+          <input type="text" [(ngModel)]="newAddress.alias" placeholder="Alias (ej. Casa, Oficina)"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white">
+          <input type="text" [(ngModel)]="newAddress.direccion" placeholder="Dirección completa"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white">
+          <div class="flex gap-2">
+            <button (click)="addAddress()"
+              class="flex-1 py-2 bg-black hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors">
+              Guardar
+            </button>
+            <button (click)="showAddressForm = false"
+              class="flex-1 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors">
+              Cancelar
+            </button>
+          </div>
+        </div>
+
+        <div *ngFor="let address of addresses"
+          class="flex items-start justify-between p-4 rounded-xl border transition-colors"
+          [ngClass]="address.es_predeterminada ? 'border-black bg-gray-50' : 'border-gray-200'">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-semibold text-gray-900">{{ address.alias }}</span>
+              <span *ngIf="address.es_predeterminada"
+                class="text-xs px-2 py-0.5 bg-black text-white rounded-full">Predeterminada</span>
+            </div>
+            <p class="text-xs text-gray-500">{{ address.direccion }}</p>
+          </div>
+          <div class="flex items-center gap-1 ml-3">
+            <button *ngIf="!address.es_predeterminada" (click)="setDefault(address.id)"
+              class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Establecer como predeterminada">
+              <lucide-angular [img]="Check" [size]="14" class="text-gray-500"></lucide-angular>
+            </button>
+            <button (click)="deleteAddress(address.id)"
+              class="p-1.5 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+              <lucide-angular [img]="Trash2" [size]="14" class="text-red-400"></lucide-angular>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="addresses.length === 0" class="text-center py-8 text-gray-400 text-sm">
+          No tienes direcciones guardadas
+        </div>
+      </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div *ngIf="activeSection === 'notificaciones'" class="p-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">Notificaciones</h3>
+      <p class="text-sm text-gray-500 mb-6">Elige qué alertas quieres recibir.</p>
+      <div class="border-t border-gray-100 pt-6 max-w-lg">
+        <div *ngFor="let notif of notificationList; let last = last"
+          class="flex items-center justify-between py-4"
+          [ngClass]="!last ? 'border-b border-gray-100' : ''">
+          <div>
+            <p class="text-sm font-medium text-gray-900">{{ notif.label }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ notif.description }}</p>
+          </div>
+          <button (click)="toggleNotification(notif.key)"
+            class="relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 ml-4"
+            [ngClass]="notifications[notif.key] ? 'bg-black' : 'bg-gray-200'">
+            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"
+              [ngClass]="notifications[notif.key] ? 'translate-x-5' : 'translate-x-0'">
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

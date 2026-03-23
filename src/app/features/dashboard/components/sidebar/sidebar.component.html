@@ -1,7 +1,7 @@
 <div class="h-16 px-4 py-4 flex md:hidden items-center justify-between w-full fixed top-0 left-0 right-0 z-40" style="background-color: #CCDAFF;">
   <a href="/" class="flex items-center space-x-2">
     <img src="assets/voltio.svg" alt="Logo" class="h-8 w-8 shrink-0">
-    <span class="font-medium text-gray-900">Voltio</span>
+    <span class="font-medium text-gray-900" style="font-family: 'Agdasima', sans-serif;">Voltio</span>
   </a>
   <button (click)="toggleMobileMenu()" class="p-2">
     <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
   <div class="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
     <a href="/" class="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal mb-8">
       <img src="assets/voltio.svg" alt="Logo" class="h-8 w-8 shrink-0">
-      <span class="font-medium whitespace-pre text-gray-900">Voltio</span>
+      <span class="font-medium whitespace-pre text-gray-900" style="font-family: 'Agdasima', sans-serif;">Voltio</span>
     </a>
 
     <nav class="flex flex-col gap-2">
@@ -87,7 +87,8 @@
         }">
         <img src="assets/voltio.svg" alt="Logo" class="h-9 w-9 shrink-0">
         <span 
-          class="font-bold whitespace-pre text-gray-900 transition-all duration-300 overflow-hidden"
+          class="text-2xl font-bold whitespace-pre text-gray-900 transition-all duration-300 overflow-hidden"
+          style="font-family: 'Agdasima', sans-serif;"
           [ngClass]="{
             'opacity-0 w-0': !isOpen(),
             'opacity-100 w-auto': isOpen()
