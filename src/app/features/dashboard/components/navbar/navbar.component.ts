@@ -58,4 +58,10 @@ export class NavbarComponent {
     this.isDropdownOpen = false;
     this.router.navigate(['dashboard/settings']);
   }
+
+  sendToSubscription(event: Event) {
+    event.stopPropagation();
+    this.isDropdownOpen = false;
+    this.router.navigate(['dashboard/subscription']);
+  }
 }

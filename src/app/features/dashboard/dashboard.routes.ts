@@ -40,6 +40,11 @@ export const DASHBOARD_ROUTES: Routes = [
         path: 'settings',
         title: 'Configuración',
         loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'subscription',
+        title: 'Mi Suscripción',
+        loadComponent: () => import('./pages/subscription/subscription.component').then(m => m.SubscriptionComponent)
       }
     ]
   }
