@@ -35,20 +35,26 @@
           <p class="text-xs text-gray-500 mt-1">ameth&#64;example.com</p>
         </div>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+        <button 
+          (click)="sendToProfile($event)"
+          class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">
           <lucide-icon [img]="User" [size]="18" class="text-gray-500"></lucide-icon>
           <span class="text-sm text-gray-700">Ver mi perfil</span>
-        </a>
+        </button>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+        <button
+          (click)="sendToSettings($event)"
+          class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">
           <lucide-icon [img]="CreditCard" [size]="18" class="text-gray-500"></lucide-icon>
           <span class="text-sm text-gray-700">Mi suscripción</span>
-        </a>
+        </button>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+        <button
+          (click)="sendToSettings($event)"
+          class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">
           <lucide-icon [img]="Settings" [size]="18" class="text-gray-500"></lucide-icon>
           <span class="text-sm text-gray-700">Configuración</span>
-        </a>
+        </button>
 
         <div class="border-t border-gray-100 mt-2 pt-2">
           <button class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">

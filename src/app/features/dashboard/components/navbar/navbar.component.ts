@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, Input } from '@angular/core';
 import { LucideAngularModule, Bell, ChevronDown, User, CreditCard, Settings, LogOut } from 'lucide-angular';
 import { NotifyModalComponent } from '../notify-modal/notify-modal.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -24,6 +25,8 @@ export class NavbarComponent {
   isDropdownOpen = false;
   isNotificationsOpen = false;
 
+  constructor (private router: Router) {}
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -42,5 +45,17 @@ export class NavbarComponent {
 
   closeNotifications() {
     this.isNotificationsOpen = false;
+  }
+
+  sendToProfile(event: Event) {
+    event.stopPropagation();
+    this.isDropdownOpen = false;
+    this.router.navigate(['dashboard/profile']);
+  }
+
+  sendToSettings(event: Event) {
+    event.stopPropagation();
+    this.isDropdownOpen = false;
+    this.router.navigate(['dashboard/settings']);
   }
 }
