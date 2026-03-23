@@ -1,6 +1,4 @@
 <section id="precios" class="relative py-20 px-6 bg-gradient-to-b from-white to-[#CCDAFF] overflow-hidden">
-
-  <!-- Header -->
   <div class="max-w-4xl mx-auto mb-14">
     <span class="inline-block mb-3 px-4 py-1 rounded-full border border-blue-200 text-blue-400 text-sm tracking-widest uppercase">
       Precios
@@ -8,6 +6,19 @@
     <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
       Planes para todos
     </h2>
+
+    <!-- Nota de comisión aquí, visible de entrada -->
+    <div class="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-6 py-4 mb-6">
+      <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <p class="text-sm text-blue-700">
+        <span class="font-semibold">Comisión por transacción:</span> Todos los planes incluyen una comisión del 
+        <span class="font-semibold">1.6%</span> por cada venta realizada a través de Voltio. 
+        Esta comisión se aplica automáticamente al momento del pago.
+      </p>
+    </div>
+
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-t border-gray-200 pt-6">
       <p class="text-base text-gray-500">
         Elige el plan que mejor se adapte a tus necesidades
@@ -15,7 +26,6 @@
     </div>
   </div>
 
-  <!-- Cards -->
   <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
     @for (plan of plans; track plan.name) {
       <div class="relative flex flex-col rounded-2xl p-7 transition-all duration-300 hover:scale-[1.02]"
@@ -23,7 +33,6 @@
              ? 'bg-gray-900 border-2 border-blue-400 shadow-2xl shadow-blue-200'
              : 'bg-white border border-gray-200 shadow-md hover:shadow-lg'">
 
-        <!-- Badge popular -->
         @if (plan.popular) {
           <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
             <span class="bg-blue-500 text-white text-xs font-semibold px-4 py-1 rounded-full tracking-wide">
@@ -32,7 +41,6 @@
           </div>
         }
 
-        <!-- Nombre y descripción -->
         <div class="mb-6">
           <p class="text-sm font-semibold tracking-widest uppercase mb-2"
              [ngClass]="plan.popular ? 'text-blue-400' : 'text-gray-400'">
@@ -43,8 +51,7 @@
                   [ngClass]="plan.popular ? 'text-white' : 'text-gray-900'">
               {{ plan.price }}
             </span>
-            <span class="text-sm mb-2"
-                  [ngClass]="plan.popular ? 'text-gray-400' : 'text-gray-400'">
+            <span class="text-sm mb-2 text-gray-400">
               MXN / {{ plan.period }}
             </span>
           </div>
@@ -54,11 +61,9 @@
           </p>
         </div>
 
-        <!-- Divisor -->
         <div class="border-t mb-6"
              [ngClass]="plan.popular ? 'border-gray-700' : 'border-gray-100'"></div>
 
-        <!-- Features -->
         <ul class="flex flex-col gap-3 mb-8 flex-1">
           @for (feature of plan.features; track feature) {
             <li class="flex items-center gap-2 text-sm"
@@ -73,7 +78,6 @@
           }
         </ul>
 
-        <!-- CTA -->
         <button class="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200"
                 [ngClass]="plan.popular
                   ? 'bg-blue-500 hover:bg-blue-400 text-white shadow-lg shadow-blue-500/30'
@@ -83,6 +87,17 @@
 
       </div>
     }
+  </div>
+
+  <div class="max-w-4xl mx-auto mt-8 flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-6 py-4">
+    <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <p class="text-sm text-blue-700">
+      <span class="font-semibold">Comisión por transacción:</span> Todos los planes incluyen una comisión del 
+      <span class="font-semibold">1.6%</span> por cada venta realizada a través de Voltio. 
+      Esta comisión se aplica automáticamente al momento del pago.
+    </p>
   </div>
 
 </section>
