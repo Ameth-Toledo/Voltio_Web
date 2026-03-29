@@ -69,7 +69,9 @@
               <span class="text-sm text-gray-500 line-clamp-1 max-w-[160px]">{{ order.direccion }}</span>
             </td>
             <td class="px-5 py-4">
-              <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver detalle">
+              <button 
+                (click)="viewOrder(order)"
+                class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver detalle">
                 <lucide-angular [img]="Eye" [size]="16" class="text-gray-500"></lucide-angular>
               </button>
             </td>

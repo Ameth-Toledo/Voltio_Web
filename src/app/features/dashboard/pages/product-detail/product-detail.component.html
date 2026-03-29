@@ -1,0 +1,98 @@
+<div class="space-y-6" *ngIf="product">
+  <app-navbar 
+    [pageTitle]="product.nombre" 
+    pageSubtitle="Detalle de producto">
+  </app-navbar>
+
+  <div class="flex items-center gap-2 text-sm text-gray-500">
+    <button (click)="goBack()" class="hover:text-gray-900 transition-colors">Productos</button>
+    <lucide-angular [img]="ChevronRight" [size]="14"></lucide-angular>
+    <span class="text-gray-900 font-medium">{{ product.nombre }}</span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="aspect-square bg-gray-50 flex items-center justify-center p-8">
+          <img [src]="product.imagen_url" [alt]="product.nombre" class="w-full h-full object-contain">
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors">
+          <lucide-angular [img]="Edit" [size]="16"></lucide-angular>
+          Editar
+        </button>
+        <button class="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-medium transition-colors">
+          <lucide-angular [img]="Trash2" [size]="16"></lucide-angular>
+          Eliminar
+        </button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2 space-y-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">{{ product.sku }}</span>
+              <span class="text-xs px-2.5 py-1 rounded-full font-medium bg-blue-50 text-blue-600">{{ product.categoria }}</span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">{{ product.nombre }}</h2>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded-full font-medium" [ngClass]="getStockClass()">
+            {{ getStockLabel() }}
+          </span>
+        </div>
+
+        <p class="text-sm text-gray-600 leading-relaxed mb-6">{{ product.descripcion }}</p>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-400 mb-1">Precio</p>
+            <p class="text-xl font-bold text-gray-900">${{ product.precio_venta }}</p>
+            <p class="text-xs text-gray-400">MXN</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-400 mb-1">Stock</p>
+            <p class="text-xl font-bold text-gray-900">{{ product.stock_actual }}</p>
+            <p class="text-xs text-gray-400">unidades</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-400 mb-1">Categoría</p>
+            <p class="text-sm font-bold text-gray-900">{{ product.categoria }}</p>
+            <p class="text-xs text-gray-400">{{ product.sku }}</p>
+        </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-base font-semibold text-gray-900 mb-4">Especificaciones</h3>
+        <div class="divide-y divide-gray-100">
+          @for (spec of product.especificaciones; track spec.clave) {
+            <div class="flex items-center justify-between py-3">
+              <span class="text-sm text-gray-500">{{ spec.clave }}</span>
+              <span class="text-sm font-medium text-gray-900">{{ spec.valor }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-base font-semibold text-gray-900 mb-4">Información adicional</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-gray-400 mb-1">Fecha de registro</p>
+            <p class="text-sm font-medium text-gray-900">{{ product.fecha_registro }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 mb-1">ID de producto</p>
+            <p class="text-sm font-medium text-gray-900">#{{ product.id_producto }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

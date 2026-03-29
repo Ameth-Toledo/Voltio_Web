@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from "../../components/navbar/navbar.component";
 import { LucideAngularModule, Plus, Search, Edit, Trash2, Eye, Package, ChevronLeft, ChevronRight } from 'lucide-angular';
 import { Product } from '../../models/Product';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-products',
@@ -28,6 +29,8 @@ export class ProductsComponent {
   currentPage = 1;
   itemsPerPage = 10;
 
+  constructor (private router: Router) {}
+
   categories = ['Todos', 'Microcontroladores', 'Sensores', 'Componentes', 'Herramientas y Equipos', 'Kits de Desarrollo', 'Robótica'];
 
   products: Product[] = [
@@ -45,6 +48,10 @@ export class ProductsComponent {
     { id_producto: 12, sku: 'ROB-002', nombre: 'Servo Motor SG90 Pack 5pz', categoria: 'Robótica', precio_venta: 95, stock_actual: 0, imagen_url: 'assets/hardware/esp32.webp', fecha_registro: '2024-01-22' },
   ];
 
+  viewProduct(product: Product) {
+    this.router.navigate(['/dashboard/products', product.nombre.toLowerCase().replace(/\s+/g, '-')]);
+  }
+  
   get filteredProducts(): Product[] {
     return this.products.filter(p => {
       const matchesSearch = p.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
