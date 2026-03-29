@@ -1,0 +1,125 @@
+<div class="space-y-6" *ngIf="order">
+  <app-navbar 
+    [pageTitle]="'Orden #' + order.id_orden" 
+    pageSubtitle="Detalle de pedido">
+  </app-navbar>
+
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2 text-sm text-gray-500">
+    <button (click)="goBack()" class="hover:text-gray-900 transition-colors">Pedidos</button>
+    <lucide-angular [img]="ChevronRight" [size]="14"></lucide-angular>
+    <span class="text-gray-900 font-medium">Orden #{{ order.id_orden }}</span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Columna izquierda -->
+    <div class="space-y-4">
+
+      <!-- Estado y fecha -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Estado del pedido</h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Estado</span>
+            <span class="text-xs px-2.5 py-1 rounded-full font-medium" [ngClass]="getStatusClass(order.estado_orden)">
+              {{ getStatusLabel(order.estado_orden) }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Fecha</span>
+            <div class="flex items-center gap-1.5">
+              <lucide-angular [img]="Clock" [size]="13" class="text-gray-400"></lucide-angular>
+              <span class="text-sm font-medium text-gray-900">{{ order.fecha_orden }}</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Orden #</span>
+            <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">#{{ order.id_orden }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cliente -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <lucide-angular [img]="User" [size]="16" class="text-gray-400"></lucide-angular>
+          Cliente
+        </h3>
+        <div class="space-y-2">
+          <p class="text-sm font-medium text-gray-900">{{ order.usuario }}</p>
+          <p class="text-xs text-gray-500">{{ order.email }}</p>
+        </div>
+      </div>
+
+      <!-- Dirección -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <lucide-angular [img]="MapPin" [size]="16" class="text-gray-400"></lucide-angular>
+          Dirección de envío
+        </h3>
+        <p class="text-sm text-gray-600">{{ order.direccion }}</p>
+      </div>
+
+      <!-- Pago -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <lucide-angular [img]="CreditCard" [size]="16" class="text-gray-400"></lucide-angular>
+          Método de pago
+        </h3>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600 capitalize">{{ order.metodo_pago_tipo }}</span>
+          <span *ngIf="order.metodo_pago_ultimos4" class="text-xs text-gray-400">···· {{ order.metodo_pago_ultimos4 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="lg:col-span-2 space-y-4">
+
+      <!-- Productos del pedido -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h3 class="text-base font-semibold text-gray-900">Productos</h3>
+        </div>
+        <div class="divide-y divide-gray-100">
+          @for (detalle of order.detalles; track detalle.id_detalle) {
+            <div class="px-6 py-4 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-lg overflow-hidden bg-gray-50 shrink-0">
+                <img [src]="detalle.imagen_url" [alt]="detalle.nombre_producto" class="w-full h-full object-contain p-2">
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">{{ detalle.nombre_producto }}</p>
+                <p class="text-xs text-gray-500 mt-0.5">Cantidad: {{ detalle.cantidad }} × ${{ detalle.precio_unitario }} MXN</p>
+              </div>
+              <p class="text-sm font-semibold text-gray-900">${{ detalle.subtotal }} MXN</p>
+            </div>
+          }
+        </div>
+
+        <!-- Totales -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 space-y-2">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Subtotal</span>
+            <span class="text-gray-900">${{ order.monto_total }} MXN</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Comisión Voltio (1.6%)</span>
+            <span class="text-gray-900">-${{ (order.monto_total * 0.016).toFixed(2) }} MXN</span>
+          </div>
+          <div class="flex items-center justify-between text-sm font-semibold border-t border-gray-200 pt-2 mt-2">
+            <span class="text-gray-900">Total recibido</span>
+            <span class="text-gray-900">${{ (order.monto_total - order.monto_total * 0.016).toFixed(2) }} MXN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div *ngIf="order.descripcion" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-2">Descripción</h3>
+        <p class="text-sm text-gray-600">{{ order.descripcion }}</p>
+      </div>
+
+    </div>
+  </div>
+</div>

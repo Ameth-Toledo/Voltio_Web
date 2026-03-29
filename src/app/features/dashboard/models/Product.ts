@@ -1,3 +1,5 @@
+import { Specification } from './Specification';
+
 export interface Product {
   id_producto: number;
   sku: string;
@@ -9,4 +11,5 @@ export interface Product {
   id_categoria?: number;
   categoria?: string;
   fecha_registro: string;
+  especificaciones?: Specification[];
 }

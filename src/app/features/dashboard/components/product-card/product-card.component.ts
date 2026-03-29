@@ -18,8 +18,7 @@ export class ProductCardComponent {
   constructor(private router: Router) {}
 
   navigateToProduct() {
-    const productName = this.name.toLowerCase().replace(/\s+/g, '-');
-    this.router.navigate(['/dashboard/products', productName]);
+    this.router.navigate(['/dashboard/products', this.name.toLowerCase().replace(/\s+/g, '-')]);
   }
 
   get categoryIcon(): string {

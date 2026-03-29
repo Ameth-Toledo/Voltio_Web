@@ -76,7 +76,9 @@
             </td>
             <td class="px-5 py-4">
               <div class="flex items-center gap-2">
-                <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver">
+                <button 
+                  (click)="viewProduct(product)"
+                  class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver">
                   <lucide-angular [img]="Eye" [size]="16" class="text-gray-500"></lucide-angular>
                 </button>
                 <button class="p-1.5 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">

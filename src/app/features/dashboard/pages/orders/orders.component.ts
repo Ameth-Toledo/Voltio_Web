@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from "../../components/navbar/navbar.component";
 import { LucideAngularModule, Search, Eye, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-angular';
 import { Order } from '../../models/Order';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
@@ -25,6 +26,8 @@ export class OrdersComponent {
   currentPage = 1;
   itemsPerPage = 10;
 
+  constructor (private router: Router) {}
+
   statuses = ['Todos', 'pendiente', 'confirmada', 'en_proceso', 'completada', 'cancelada'];
 
   orders: Order[] = [
@@ -40,10 +43,14 @@ export class OrdersComponent {
     { id_orden: 1010, id_usuario: 10, usuario: 'Isabella Moreno', fecha_orden: '2024-01-24', estado_orden: 'completada', monto_total: 2400, direccion: 'Blvd. López Mateos 321, Tijuana', metodo_pago_tipo: 'tarjeta', metodo_pago_ultimos4: '2222' },
   ];
 
+  viewOrder(order: Order) {
+    this.router.navigate(['/dashboard/orders', order.id_orden]);
+  }
+
   get filteredOrders(): Order[] {
     return this.orders.filter(o => {
-      const matchesSearch = o.usuario.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           o.id_orden.toString().includes(this.searchQuery);
+      const matchesSearch = (o.usuario ?? '').toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                          o.id_orden.toString().includes(this.searchQuery);
       const matchesStatus = this.selectedStatus === 'Todos' || o.estado_orden === this.selectedStatus;
       return matchesSearch && matchesStatus;
     });

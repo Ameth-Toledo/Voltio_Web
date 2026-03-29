@@ -45,6 +45,16 @@ export const DASHBOARD_ROUTES: Routes = [
         path: 'subscription',
         title: 'Mi Suscripción',
         loadComponent: () => import('./pages/subscription/subscription.component').then(m => m.SubscriptionComponent)
+      },
+      {
+        path: 'products/:id',
+        title: 'Detalle de Producto',
+        loadComponent: () => import('./pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent)
+      },
+      {
+        path: 'orders/:id',
+        title: 'Detalle de Pedido',
+        loadComponent: () => import('./pages/order-detail/order-detail.component').then(m => m.OrderDetailComponent)
       }
     ]
   }
