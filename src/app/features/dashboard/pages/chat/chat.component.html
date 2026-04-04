@@ -108,6 +108,7 @@
                     @if (msg.tipo_mensaje === 'imagen') {
                       <img
                         [src]="msg.archivo_url"
+                        alt="Imagen del mensaje"
                         class="rounded-xl max-w-full max-h-60 object-cover cursor-pointer hover:opacity-90 transition-opacity"
                         (click)="abrirImagen(msg.archivo_url!)"/>
                       @if (msg.contenido) {
@@ -221,7 +222,7 @@
       <!-- Preview -->
       <div class="rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center min-h-48 max-h-64">
         @if (archivoPreviewUrl && archivoPreview?.type?.startsWith('image/')) {
-          <img [src]="archivoPreviewUrl" class="max-w-full max-h-64 object-contain"/>
+          <img [src]="archivoPreviewUrl" class="max-w-full max-h-64 object-contain" alt="Vista previa del archivo"/>
         } @else if (archivoPreviewUrl && archivoPreview?.type?.startsWith('video/')) {
           <video [src]="archivoPreviewUrl" controls class="max-w-full max-h-64"></video>
         } @else {

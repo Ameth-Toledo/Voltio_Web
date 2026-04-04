@@ -14,7 +14,7 @@
       <lucide-angular [img]="banner.activo ? EyeOff : Eye" [size]="13"></lucide-angular>
       {{ banner.activo ? 'Desactivar' : 'Activar' }}
     </button>
-    <button (click)="delete.emit(banner.id)"
+    <button (click)="deleteItem.emit(banner.id)"
       class="p-1.5 bg-white hover:bg-red-50 rounded-lg transition-colors">
       <lucide-angular [img]="Trash2" [size]="15" class="text-red-400"></lucide-angular>
     </button>

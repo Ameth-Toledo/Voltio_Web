@@ -36,6 +36,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   archivoPreview: File | null = null;
   archivoPreviewUrl: string | null = null;
   captionTexto = '';
+  subiendoArchivo = false;
 
   private shouldScroll = false;
   private destroy$ = new Subject<void>();
@@ -135,12 +136,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.isLoadingMensajes = true;
     this.chatService.unirseAConversacion(conv.id_conversacion);
 
-    this.chatService.getMensajes(conv.id_conversacion).subscribe({ 
+    this.chatService.getMensajes(conv.id_conversacion).subscribe({
       next: (data) => {
         this.mensajes = data;
         this.isLoadingMensajes = false;
         this.shouldScroll = true;
-        this.chatService.marcarLeido(conv.id_conversacion, this.idUsuario); 
+        this.chatService.marcarLeido(conv.id_conversacion, this.idUsuario);
       },
       error: () => { this.isLoadingMensajes = false; }
     });
@@ -160,7 +161,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   enviarMensaje(): void {
     if (!this.nuevoMensaje.trim() || !this.conversacionSeleccionada) return;
     this.chatService.enviarMensaje(
-      this.conversacionSeleccionada.id_conversacion, 
+      this.conversacionSeleccionada.id_conversacion,
       this.idUsuario,
       this.nuevoMensaje.trim()
     );
@@ -172,10 +173,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     try {
       this.mensajesContainer.nativeElement.scrollTop =
         this.mensajesContainer.nativeElement.scrollHeight;
-    } catch {}
+    } catch {
+      // scroll ignorado si el contenedor no está disponible
+    }
   }
-
-  subiendoArchivo = false;
 
   subirArchivo(event: Event): void {
     const input = event.target as HTMLInputElement;
