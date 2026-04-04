@@ -32,8 +32,8 @@
     @for (banner of banners; track banner.id) {
         <app-banner-card
         [banner]="banner"
-        (toggle)="toggleBanner($event)"
-        (delete)="deleteBanner($event)">
+        (toggleBanner)="toggleBanner($event)"
+        (deleteItem)="deleteBanner($event)">
         </app-banner-card>
     }
     </div>

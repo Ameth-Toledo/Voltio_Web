@@ -9,7 +9,7 @@
       [ngClass]="banner.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
       {{ banner.activo ? 'Activo' : 'Inactivo' }}
     </span>
-    <button (click)="toggle.emit(banner.id)"
+    <button (click)="toggleBanner.emit(banner.id)"
       class="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors">
       <lucide-angular [img]="banner.activo ? EyeOff : Eye" [size]="13"></lucide-angular>
       {{ banner.activo ? 'Desactivar' : 'Activar' }}

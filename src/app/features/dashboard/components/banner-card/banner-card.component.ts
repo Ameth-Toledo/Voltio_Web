@@ -12,7 +12,7 @@ import { Banner } from '../../models/Banner';
 })
 export class BannerCardComponent {
   @Input() banner!: Banner;
-  @Output() toggle = new EventEmitter<number>();
+  @Output() toggleBanner = new EventEmitter<number>();
   @Output() deleteItem = new EventEmitter<number>();
 
   readonly Trash2 = Trash2;
