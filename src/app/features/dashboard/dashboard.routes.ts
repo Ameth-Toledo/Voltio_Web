@@ -55,7 +55,17 @@ export const DASHBOARD_ROUTES: Routes = [
         path: 'orders/:id',
         title: 'Detalle de Pedido',
         loadComponent: () => import('./pages/order-detail/order-detail.component').then(m => m.OrderDetailComponent)
-      }
+      },
+      {
+        path: 'advertising',
+        title: 'Publicidad',
+        loadComponent: () => import('./pages/advertising/advertising.component').then(m => m.AdvertisingComponent)
+      },
+      {
+        path: 'chat',
+        title: 'Chat',
+        loadComponent: () => import('./pages/chat/chat.component').then(m => m.ChatComponent)
+      },
     ]
   }
 ];
