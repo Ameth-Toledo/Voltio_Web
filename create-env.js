@@ -10,6 +10,7 @@ if (!fs.existsSync(envDir)) {
 
 const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
 const apiUrl = process.env.API_URL || 'http://localhost:8080';
+const socketUrl = process.env.SOCKET_URL || 'http://localhost:8080';
 const paypalClientId = process.env.PAYPAL_CLIENT_ID || '';
 const paypalCurrency = process.env.PAYPAL_CURRENCY || 'MXN';
 const paypalMode = process.env.PAYPAL_MODE || 'sandbox';
@@ -17,6 +18,7 @@ const paypalMode = process.env.PAYPAL_MODE || 'sandbox';
 const envContent = `export const environment = {
   production: ${isProduction},
   apiUrl: '${apiUrl}',
+  socketUrl: '${socketUrl}',
   paypal: {
     clientId: '${paypalClientId}',
     currency: '${paypalCurrency}',
@@ -29,4 +31,5 @@ fs.writeFileSync(envFile, envContent);
 console.log('   Environment file created successfully');
 console.log(`   Production: ${isProduction}`);
 console.log(`   API URL: ${apiUrl}`);
+console.log(`   Socket URL: ${socketUrl}`);
 console.log(`   PayPal mode: ${paypalMode}`);
