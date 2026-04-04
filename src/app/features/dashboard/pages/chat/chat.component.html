@@ -1,0 +1,269 @@
+<div class="space-y-6">
+  <app-navbar pageTitle="CHAT" pageSubtitle="Panel de vendedor"></app-navbar>
+  <div class="flex h-[calc(100vh-160px)] rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm w-full">
+
+    <!-- Lista de conversaciones -->
+    <div class="w-80 flex-shrink-0 border-r border-gray-100 flex flex-col">
+      <div class="p-4 border-b border-gray-100">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+          </svg>
+          <input type="text" placeholder="Buscar conversación..." [(ngModel)]="searchTerm"
+            class="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 border border-gray-100 text-sm outline-none focus:border-gray-300 transition-colors"/>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto">
+        @if (isLoadingConversaciones) {
+          <div class="flex items-center justify-center h-32">
+            <span class="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+          </div>
+        } @else if (conversacionesFiltradas.length === 0) {
+          <div class="flex flex-col items-center justify-center h-32 text-gray-400 gap-2">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <p class="text-sm">Sin conversaciones</p>
+          </div>
+        } @else {
+          @for (conv of conversacionesFiltradas; track conv.id_conversacion) {
+            <div
+              (click)="seleccionarConversacion(conv)"
+              class="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-gray-50"
+              [class.bg-\[#CFDAFF\]]="conversacionSeleccionada?.id_conversacion === conv.id_conversacion"
+              [class.hover:bg-gray-50]="conversacionSeleccionada?.id_conversacion !== conv.id_conversacion"
+              [class.hover:bg-\[#CFDAFF\]]="conversacionSeleccionada?.id_conversacion === conv.id_conversacion">
+              <div class="relative flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white text-sm font-medium">
+                  {{ conv.nombre_usuario.charAt(0).toUpperCase() }}
+                </div>
+                @if (conv.no_leidos > 0) {
+                  <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
+                    {{ conv.no_leidos }}
+                  </span>
+                }
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-medium text-gray-900 truncate">{{ conv.nombre_usuario }}</p>
+                  <span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">
+                    {{ conv.ultimo_mensaje_fecha | date:'HH:mm' }}
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 truncate mt-0.5">{{ conv.ultimo_mensaje || 'Sin mensajes' }}</p>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Panel de mensajes -->
+    @if (!conversacionSeleccionada) {
+      <div class="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+        <p class="text-sm">Selecciona una conversación</p>
+      </div>
+    } @else {
+      <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-sm font-medium">
+            {{ conversacionSeleccionada.nombre_usuario.charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-900">{{ conversacionSeleccionada.nombre_usuario }}</p>
+            <p class="text-xs text-gray-400">Cliente</p>
+          </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div #mensajesContainer class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+          @if (isLoadingMensajes) {
+            <div class="flex items-center justify-center h-full">
+              <span class="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+            </div>
+          } @else {
+            @for (msg of mensajes; track msg.id_mensaje) {
+              <div class="flex" [class.justify-end]="msg.id_remitente === idUsuario">
+                <div class="max-w-xs lg:max-w-md">
+
+                  <div
+                    class="rounded-2xl text-sm overflow-hidden"
+                    [class.bg-black]="msg.id_remitente === idUsuario"
+                    [class.text-white]="msg.id_remitente === idUsuario"
+                    [class.bg-gray-100]="msg.id_remitente !== idUsuario"
+                    [class.text-gray-900]="msg.id_remitente !== idUsuario"
+                    [class.rounded-br-sm]="msg.id_remitente === idUsuario"
+                    [class.rounded-bl-sm]="msg.id_remitente !== idUsuario"
+                    [class.px-4]="msg.tipo_mensaje === 'texto' || !msg.tipo_mensaje"
+                    [class.py-2]="msg.tipo_mensaje === 'texto' || !msg.tipo_mensaje || msg.tipo_mensaje === 'archivo'"
+                    [class.px-3]="msg.tipo_mensaje === 'archivo'"
+                    [class.p-1]="msg.tipo_mensaje === 'imagen' || msg.tipo_mensaje === 'video'">
+
+                    @if (msg.tipo_mensaje === 'imagen') {
+                      <img
+                        [src]="msg.archivo_url"
+                        class="rounded-xl max-w-full max-h-60 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                        (click)="abrirImagen(msg.archivo_url!)"/>
+                      @if (msg.contenido) {
+                        <p class="text-xs px-3 pt-2 pb-1 opacity-90 leading-relaxed">{{ msg.contenido }}</p>
+                      }
+                    } @else if (msg.tipo_mensaje === 'video') {
+                      <video [src]="msg.archivo_url" controls class="rounded-xl max-w-full max-h-60"></video>
+                      @if (msg.contenido) {
+                        <p class="text-xs px-3 pt-2 pb-1 opacity-90 leading-relaxed">{{ msg.contenido }}</p>
+                      }
+                    } @else if (msg.tipo_mensaje === 'archivo') {
+                      <a [href]="msg.archivo_url" target="_blank"
+                         class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                             [class.bg-gray-700]="msg.id_remitente === idUsuario"
+                             [class.bg-gray-300]="msg.id_remitente !== idUsuario">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                          </svg>
+                        </div>
+                        <span class="text-xs underline underline-offset-2">Descargar archivo</span>
+                      </a>
+                      @if (msg.contenido) {
+                        <p class="text-xs pt-2 opacity-90 leading-relaxed">{{ msg.contenido }}</p>
+                      }
+                    } @else {
+                      <span class="px-1">{{ msg.contenido }}</span>
+                    }
+
+                  </div>
+
+                  <p class="text-[10px] text-gray-400 mt-1" [class.text-right]="msg.id_remitente === idUsuario">
+                    {{ msg.created_at | date:'HH:mm' }}
+                  </p>
+
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Typing indicator -->
+        @if (escribiendo) {
+          <p class="px-6 pb-2">
+            <span class="bg-black text-white px-4 py-2 rounded-full text-xs italic tracking-wide">
+              ✦ {{ escribiendo }} está escribiendo...
+            </span>
+          </p>
+        }
+
+        <!-- Input -->
+        <div class="px-6 py-4 border-t border-gray-100">
+          <div class="flex items-center gap-3">
+
+            <label
+              class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors flex-shrink-0"
+              [class.opacity-40]="subiendoArchivo"
+              [class.pointer-events-none]="subiendoArchivo">
+              @if (subiendoArchivo) {
+                <span class="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></span>
+              } @else {
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                </svg>
+              }
+              <input type="file" class="hidden"
+                accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx"
+                (change)="subirArchivo($event)"/>
+            </label>
+
+            <input type="text" placeholder="Escribe un mensaje..."
+              [(ngModel)]="nuevoMensaje"
+              (ngModelChange)="onEscribiendo()"
+              (keydown.enter)="enviarMensaje()"
+              class="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors"/>
+
+            <button (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()"
+              class="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0">
+              <svg class="w-4 h-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+              </svg>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Modal preview archivo -->
+@if (mostrarModalArchivo) {
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" (click.self)="cerrarModalArchivo()">
+    <div class="bg-white rounded-2xl p-5 w-96 flex flex-col gap-4 shadow-2xl">
+
+      <!-- Header modal -->
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-900">Vista previa</h3>
+        <button (click)="cerrarModalArchivo()"
+          class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Preview -->
+      <div class="rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center min-h-48 max-h-64">
+        @if (archivoPreviewUrl && archivoPreview?.type?.startsWith('image/')) {
+          <img [src]="archivoPreviewUrl" class="max-w-full max-h-64 object-contain"/>
+        } @else if (archivoPreviewUrl && archivoPreview?.type?.startsWith('video/')) {
+          <video [src]="archivoPreviewUrl" controls class="max-w-full max-h-64"></video>
+        } @else {
+          <div class="flex flex-col items-center gap-3 py-8 px-4 text-center">
+            <div class="w-12 h-12 rounded-xl bg-gray-200 flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600 break-all">{{ archivoPreview?.name }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Caption input -->
+      <input
+        type="text"
+        placeholder="Añadir comentario... (opcional)"
+        [(ngModel)]="captionTexto"
+        (keydown.enter)="enviarArchivoConCaption()"
+        (keydown.escape)="cerrarModalArchivo()"
+        #captionInput
+        class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors"/>
+
+      <!-- Botones -->
+      <div class="flex gap-2">
+        <button (click)="cerrarModalArchivo()"
+          class="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors">
+          Cancelar
+        </button>
+        <button (click)="enviarArchivoConCaption()" [disabled]="subiendoArchivo"
+          class="flex-1 py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          @if (subiendoArchivo) {
+            <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            Enviando...
+          } @else {
+            Enviar
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
