@@ -11,14 +11,30 @@ export class ChatService {
   private mensajeNuevo$ = new Subject<Mensaje>();
   private usuarioEscribiendo$ = new Subject<string>();
   private usuarioDejoEscribir$ = new Subject<void>();
+  private badgeUpdate$ = new Subject<{ id_conversacion: number; ultimo_mensaje?: string | null; tipo_mensaje?: string; ultimo_mensaje_fecha?: string }>();
+
+  private idEmpresaActual: number | null = null;
+  private idConversacionActual: number | null = null;
 
   constructor(private http: HttpClient) {}
 
   conectar(): void {
     this.socket = io(environment.socketUrl, {
-      auth: {
-        token: localStorage.getItem('access_token')
+      auth: { token: localStorage.getItem('access_token') }
+    });
+
+    // Re-unirse a los rooms al reconectar
+    this.socket.on('connect', () => {
+      if (this.idEmpresaActual) {
+        this.socket.emit('join_empresa', this.idEmpresaActual);
       }
+      if (this.idConversacionActual) {
+        this.socket.emit('join_conversation', this.idConversacionActual);
+      }
+    });
+
+    this.socket.on('badge_update', (data) => {
+      this.badgeUpdate$.next(data);
     });
 
     this.socket.on('new_message', (msg: Mensaje) => {
@@ -39,14 +55,21 @@ export class ChatService {
   }
 
   unirseAConversacion(idConversacion: number): void {
+    this.idConversacionActual = idConversacion;
     this.socket.emit('join_conversation', idConversacion);
   }
 
-  enviarMensaje(idConversacion: number, idRemitente: number, contenido: string): void {
+  unirseAEmpresa(idEmpresa: number): void {
+    this.idEmpresaActual = idEmpresa;
+    this.socket.emit('join_empresa', idEmpresa);
+  }
+
+  enviarMensaje(idConversacion: number, idRemitente: number, contenido: string, idMensajeReply?: number | null): void {
     this.socket.emit('send_message', {
       id_conversacion: idConversacion,
       id_remitente: idRemitente,
-      contenido
+      contenido,
+      id_mensaje_reply: idMensajeReply ?? null
     });
   }
 
@@ -84,23 +107,28 @@ export class ChatService {
     return this.usuarioDejoEscribir$.asObservable();
   }
 
+  onBadgeUpdate(): Observable<{ id_conversacion: number; ultimo_mensaje?: string | null; tipo_mensaje?: string; ultimo_mensaje_fecha?: string }> {
+    return this.badgeUpdate$.asObservable();
+  }
+
   getConversacionesPorEmpresa(idEmpresa: number): Observable<Conversacion[]> {
     return this.http.get<Conversacion[]>(
-      `${environment.apiUrl}/empresas/${idEmpresa}/conversaciones`
+      `${environment.apiUrl}/empresas/${idEmpresa}/conversaciones?t=${Date.now()}`
     );
   }
 
   getMensajes(idConversacion: number): Observable<Mensaje[]> {
     return this.http.get<Mensaje[]>(
-      `${environment.apiUrl}/conversaciones/${idConversacion}/mensajes`
+      `${environment.apiUrl}/conversaciones/${idConversacion}/mensajes?t=${Date.now()}`
     );
   }
 
-  subirArchivo(idConversacion: number, idRemitente: number, file: File, caption?: string): Observable<Mensaje> {
+  subirArchivo(idConversacion: number, idRemitente: number, file: File, caption?: string, idMensajeReply?: number | null): Observable<Mensaje> {
     const formData = new FormData();
     formData.append('archivo', file);
     formData.append('id_remitente', idRemitente.toString());
     if (caption?.trim()) formData.append('caption', caption.trim());
+    if (idMensajeReply) formData.append('id_mensaje_reply', idMensajeReply.toString());
 
     return this.http.post<Mensaje>(
       `${environment.apiUrl}/conversaciones/${idConversacion}/archivo`,

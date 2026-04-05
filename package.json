@@ -22,6 +22,7 @@
     "@types/leaflet": "^1.9.21",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
+    "emoji-picker-element": "^1.29.1",
     "gsap": "^3.14.2",
     "leaflet": "^1.9.4",
     "lucide-angular": "^0.563.0",

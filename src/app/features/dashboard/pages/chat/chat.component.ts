@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -9,11 +9,13 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
+import 'emoji-picker-element';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
@@ -32,11 +34,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   idEmpresa = 0;
   idUsuario = 0;
 
-  mostrarModalArchivo = false;
   archivoPreview: File | null = null;
   archivoPreviewUrl: string | null = null;
   captionTexto = '';
   subiendoArchivo = false;
+
+  replyingTo: Mensaje | null = null;
+  mostrarEmojis = false;
 
   private shouldScroll = false;
   private destroy$ = new Subject<void>();
@@ -72,7 +76,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
           this.shouldScroll = true;
           this.chatService.marcarLeido(msg.id_conversacion, this.idUsuario);
         }
-        this.cargarConversaciones();
+        const conv = this.conversaciones.find(c => c.id_conversacion === msg.id_conversacion);
+        if (conv) {
+          conv.ultimo_mensaje = msg.tipo_mensaje === 'texto' ? msg.contenido : '📎 Archivo';
+          conv.ultimo_mensaje_fecha = msg.created_at;
+        }
       });
 
     this.chatService.onUsuarioEscribiendo()
@@ -82,6 +90,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.chatService.onUsuarioDejoEscribir()
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => { this.escribiendo = ''; });
+
+    this.chatService.onBadgeUpdate()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => {
+        const conv = this.conversaciones.find(c => c.id_conversacion === data.id_conversacion);
+        if (conv) {
+          if (this.conversacionSeleccionada?.id_conversacion !== data.id_conversacion) {
+            conv.no_leidos = (conv.no_leidos || 0) + 1;
+          }
+          if (data.ultimo_mensaje !== undefined) {
+            conv.ultimo_mensaje = data.tipo_mensaje === 'texto' ? data.ultimo_mensaje : '📎 Archivo';
+            conv.ultimo_mensaje_fecha = data.ultimo_mensaje_fecha ?? conv.ultimo_mensaje_fecha;
+          }
+        }
+      });
 
     this.typingSubject$
       .pipe(debounceTime(1000), takeUntil(this.destroy$))
@@ -111,6 +134,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     ).subscribe({
       next: (empresa) => {
         this.idEmpresa = empresa.id_empresa;
+        this.chatService.unirseAEmpresa(this.idEmpresa);
         this.cargarConversaciones();
       },
       error: () => {
@@ -133,6 +157,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   seleccionarConversacion(conv: Conversacion): void {
     this.conversacionSeleccionada = conv;
+    conv.no_leidos = 0;
     this.isLoadingMensajes = true;
     this.chatService.unirseAConversacion(conv.id_conversacion);
 
@@ -163,19 +188,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.chatService.enviarMensaje(
       this.conversacionSeleccionada.id_conversacion,
       this.idUsuario,
-      this.nuevoMensaje.trim()
+      this.nuevoMensaje.trim(),
+      this.replyingTo?.id_mensaje
     );
     this.nuevoMensaje = '';
+    this.replyingTo = null;
+    this.mostrarEmojis = false;
     this.typingSubject$.next();
-  }
-
-  private scrollAlFinal(): void {
-    try {
-      this.mensajesContainer.nativeElement.scrollTop =
-        this.mensajesContainer.nativeElement.scrollHeight;
-    } catch {
-      // scroll ignorado si el contenedor no está disponible
-    }
   }
 
   subirArchivo(event: Event): void {
@@ -193,11 +212,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     } else {
       this.archivoPreviewUrl = null;
     }
-    this.mostrarModalArchivo = true;
   }
 
-  cerrarModalArchivo(): void {
-    this.mostrarModalArchivo = false;
+  cancelarArchivoPreview(): void {
     this.archivoPreview = null;
     this.archivoPreviewUrl = null;
     this.captionTexto = '';
@@ -206,19 +223,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   enviarArchivoConCaption(): void {
     if (!this.archivoPreview || !this.conversacionSeleccionada || this.subiendoArchivo) return;
     this.subiendoArchivo = true;
-    this.mostrarModalArchivo = false;
 
     this.chatService.subirArchivo(
       this.conversacionSeleccionada.id_conversacion,
       this.idUsuario,
       this.archivoPreview,
-      this.captionTexto
+      this.captionTexto,
+      this.replyingTo?.id_mensaje
     ).subscribe({
       next: () => {
         this.subiendoArchivo = false;
         this.archivoPreview = null;
         this.archivoPreviewUrl = null;
         this.captionTexto = '';
+        this.replyingTo = null;
       },
       error: (err) => {
         console.error('Error subiendo archivo:', err);
@@ -227,7 +245,35 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
+  responderMensaje(msg: Mensaje): void {
+    this.replyingTo = msg;
+    this.mostrarEmojis = false;
+  }
+
+  cancelarRespuesta(): void {
+    this.replyingTo = null;
+  }
+
+  insertarEmoji(event: Event): void {
+    const emoji = (event as CustomEvent).detail?.unicode ?? '';
+    if (this.archivoPreview) {
+      this.captionTexto += emoji;
+    } else {
+      this.nuevoMensaje += emoji;
+    }
+    this.mostrarEmojis = false;
+  }
+
   abrirImagen(url: string): void {
     window.open(url, '_blank');
+  }
+
+  private scrollAlFinal(): void {
+    try {
+      this.mensajesContainer.nativeElement.scrollTop =
+        this.mensajesContainer.nativeElement.scrollHeight;
+    } catch {
+      // ignorado si el contenedor no está disponible
+    }
   }
 }
