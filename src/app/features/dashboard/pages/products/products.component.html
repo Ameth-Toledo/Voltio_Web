@@ -205,7 +205,7 @@
         <label class="block text-xs font-medium text-gray-600 mb-1.5">Imagen del producto</label>
         <div class="flex items-center gap-4">
           <div class="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-            <img *ngIf="imagenPreview" [src]="imagenPreview" class="w-full h-full object-cover">
+            <img *ngIf="imagenPreview" [src]="imagenPreview" alt="Vista previa del producto" class="w-full h-full object-cover">
             <lucide-angular *ngIf="!imagenPreview" [img]="ImageOff" [size]="24" class="text-gray-300"></lucide-angular>
           </div>
           <label class="flex-1 cursor-pointer">

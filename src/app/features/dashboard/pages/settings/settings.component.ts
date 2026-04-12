@@ -174,7 +174,7 @@ export class SettingsComponent implements OnInit {
   private loadNotifications(userId: number): void {
     const stored = localStorage.getItem(NOTIF_KEY(userId));
     if (stored) {
-      try { this.notifications = { ...this.notifications, ...JSON.parse(stored) }; } catch {}
+      try { this.notifications = { ...this.notifications, ...JSON.parse(stored) }; } catch (e) { /* ignorar JSON inválido */ }
     }
   }
 
