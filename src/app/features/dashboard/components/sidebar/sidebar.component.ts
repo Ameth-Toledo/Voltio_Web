@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { MenuItem } from '../../models/MenuItem';
+import { AuthService } from '../../../auth/services/auth.service';
+import { UserResponse } from '../../../auth/models/auth.models';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,9 +12,11 @@ import { MenuItem } from '../../models/MenuItem';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
-  isOpen = signal(false);
+export class SidebarComponent implements OnInit {
+  isOpen           = signal(false);
   isMobileMenuOpen = signal(false);
+
+  currentUser: UserResponse | null = null;
 
   menuItems: MenuItem[] = [
     {
@@ -51,25 +55,47 @@ export class SidebarComponent {
       icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
     },
     {
+      label: 'Wallet',
+      route: '/dashboard/wallet',
+      icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
+    },
+    {
       label: 'Publicidad',
       route: '/dashboard/advertising',
       icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z'
     }
   ];
 
-  onMouseEnter() {
-    this.isOpen.set(true);
+  constructor(
+    private authService: AuthService,
+    private router:      Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.currentUser = this.authService.getUser();
   }
 
-  onMouseLeave() {
-    this.isOpen.set(false);
+  get displayName(): string {
+    if (!this.currentUser) return '';
+    return `${this.currentUser.name} ${this.currentUser.lastname}`.trim();
   }
 
-  toggleMobileMenu() {
-    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+  get initials(): string {
+    if (!this.currentUser) return '?';
+    const n = this.currentUser.name?.charAt(0) ?? '';
+    const l = this.currentUser.lastname?.charAt(0) ?? '';
+    return (n + l).toUpperCase() || '?';
   }
 
-  closeMobileMenu() {
+  logout(): void {
     this.isMobileMenuOpen.set(false);
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
+
+  onMouseEnter(): void { this.isOpen.set(true);  }
+  onMouseLeave(): void { this.isOpen.set(false); }
+
+  toggleMobileMenu(): void  { this.isMobileMenuOpen.set(!this.isMobileMenuOpen()); }
+  closeMobileMenu(): void   { this.isMobileMenuOpen.set(false); }
 }

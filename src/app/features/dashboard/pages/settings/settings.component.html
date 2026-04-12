@@ -1,28 +1,42 @@
 <div class="space-y-6">
-  <app-navbar 
-    pageTitle="CONFIGURACIÓN" 
-    pageSubtitle="Panel de vendedor">
+  <app-navbar
+    pageTitle="Configuración"
+    pageSubtitle="Gestiona tu cuenta y preferencias">
   </app-navbar>
 
-  <!-- Tabs header -->
+  <!-- Tabs -->
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
     <div class="flex border-b border-gray-100">
       <button *ngFor="let section of sections"
         (click)="activeSection = section.id"
         class="flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors border-b-2 -mb-px"
-        [ngClass]="activeSection === section.id 
-          ? 'border-black text-black' 
+        [ngClass]="activeSection === section.id
+          ? 'border-black text-black'
           : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'">
         <lucide-angular [img]="section.icon" [size]="16"></lucide-angular>
         {{ section.label }}
       </button>
     </div>
 
-    <!-- Cuenta -->
+    <!-- ── Cuenta ────────────────────────────────────────────────────────── -->
     <div *ngIf="activeSection === 'cuenta'" class="p-8">
       <h3 class="text-lg font-semibold text-gray-900 mb-1">Cuenta</h3>
-      <p class="text-sm text-gray-500 mb-6">Actualiza tu información de contacto.</p>
+      <p class="text-sm text-gray-500 mb-6">Actualiza tu correo y teléfono de contacto.</p>
       <div class="border-t border-gray-100 pt-6 space-y-5 max-w-lg">
+
+        <!-- Error -->
+        <div *ngIf="accountError"
+          class="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          <lucide-angular [img]="AlertCircle" [size]="15" class="flex-shrink-0"></lucide-angular>
+          {{ accountError }}
+        </div>
+        <!-- Éxito -->
+        <div *ngIf="accountSuccess"
+          class="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+          <lucide-angular [img]="CheckCircle" [size]="15" class="flex-shrink-0"></lucide-angular>
+          {{ accountSuccess }}
+        </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Correo electrónico</label>
           <input type="email" [(ngModel)]="account.email"
@@ -34,21 +48,34 @@
             class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 transition-colors">
         </div>
         <div class="pt-2">
-          <button (click)="saveAccount()"
-            class="px-6 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
-            [ngClass]="savedAccount ? 'bg-green-500 text-white' : 'bg-black hover:bg-gray-800 text-white'">
-            <lucide-angular *ngIf="savedAccount" [img]="Check" [size]="16"></lucide-angular>
-            {{ savedAccount ? 'Guardado' : 'Guardar cambios' }}
+          <button (click)="saveAccount()" [disabled]="isSavingAccount"
+            class="px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            <lucide-angular *ngIf="isSavingAccount" [img]="Loader" [size]="15" class="animate-spin"></lucide-angular>
+            {{ isSavingAccount ? 'Guardando...' : 'Guardar cambios' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Seguridad -->
+    <!-- ── Seguridad ──────────────────────────────────────────────────────── -->
     <div *ngIf="activeSection === 'seguridad'" class="p-8">
       <h3 class="text-lg font-semibold text-gray-900 mb-1">Seguridad</h3>
       <p class="text-sm text-gray-500 mb-6">Cambia tu contraseña periódicamente para mayor seguridad.</p>
       <div class="border-t border-gray-100 pt-6 space-y-5 max-w-lg">
+
+        <!-- Error -->
+        <div *ngIf="passwordError"
+          class="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          <lucide-angular [img]="AlertCircle" [size]="15" class="flex-shrink-0"></lucide-angular>
+          {{ passwordError }}
+        </div>
+        <!-- Éxito -->
+        <div *ngIf="passwordSuccess"
+          class="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+          <lucide-angular [img]="CheckCircle" [size]="15" class="flex-shrink-0"></lucide-angular>
+          {{ passwordSuccess }}
+        </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Contraseña actual</label>
           <div class="relative">
@@ -89,18 +116,16 @@
             class="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
         </div>
         <div class="pt-2">
-          <button (click)="savePassword()"
-            [disabled]="!password.current || !password.new || password.new !== password.confirm"
-            class="px-6 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            [ngClass]="savedPassword ? 'bg-green-500 text-white' : 'bg-black hover:bg-gray-800 text-white'">
-            <lucide-angular *ngIf="savedPassword" [img]="Check" [size]="16"></lucide-angular>
-            {{ savedPassword ? 'Contraseña actualizada' : 'Cambiar contraseña' }}
+          <button (click)="savePassword()" [disabled]="isSavingPassword"
+            class="px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            <lucide-angular *ngIf="isSavingPassword" [img]="Loader" [size]="15" class="animate-spin"></lucide-angular>
+            {{ isSavingPassword ? 'Cambiando...' : 'Cambiar contraseña' }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Direcciones -->
+    <!-- ── Direcciones ────────────────────────────────────────────────────── -->
     <div *ngIf="activeSection === 'direcciones'" class="p-8">
       <div class="flex items-center justify-between mb-1">
         <h3 class="text-lg font-semibold text-gray-900">Direcciones</h3>
@@ -153,17 +178,25 @@
           </div>
         </div>
 
-        <div *ngIf="addresses.length === 0" class="text-center py-8 text-gray-400 text-sm">
+        <div *ngIf="addresses.length === 0 && !showAddressForm"
+          class="text-center py-8 text-gray-400 text-sm">
           No tienes direcciones guardadas
         </div>
       </div>
     </div>
 
-    <!-- Notificaciones -->
+    <!-- ── Notificaciones ─────────────────────────────────────────────────── -->
     <div *ngIf="activeSection === 'notificaciones'" class="p-8">
-      <h3 class="text-lg font-semibold text-gray-900 mb-1">Notificaciones</h3>
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-lg font-semibold text-gray-900">Notificaciones</h3>
+        <span *ngIf="notifSaved"
+          class="flex items-center gap-1.5 text-xs text-green-600 bg-green-50 border border-green-200 px-3 py-1 rounded-full">
+          <lucide-angular [img]="CheckCircle" [size]="13"></lucide-angular>
+          Guardado
+        </span>
+      </div>
       <p class="text-sm text-gray-500 mb-6">Elige qué alertas quieres recibir.</p>
-      <div class="border-t border-gray-100 pt-6 max-w-lg">
+      <div class="border-t border-gray-100 pt-2 max-w-lg">
         <div *ngFor="let notif of notificationList; let last = last"
           class="flex items-center justify-between py-4"
           [ngClass]="!last ? 'border-b border-gray-100' : ''">

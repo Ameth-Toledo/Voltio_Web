@@ -10,15 +10,18 @@ import { CommonModule } from '@angular/common';
   styleUrl: './product-card.component.css'
 })
 export class ProductCardComponent {
-  @Input() imgSrc = '';
-  @Input() name = '';
-  @Input() category = '';
-  @Input() rating = '';
+  @Input() imgSrc     = '';
+  @Input() name       = '';
+  @Input() category   = '';
+  @Input() rating     = '';
+  @Input() productId  = 0;
 
   constructor(private router: Router) {}
 
   navigateToProduct() {
-    this.router.navigate(['/dashboard/products', this.name.toLowerCase().replace(/\s+/g, '-')]);
+    if (this.productId) {
+      this.router.navigate(['/dashboard/products', this.productId]);
+    }
   }
 
   get categoryIcon(): string {

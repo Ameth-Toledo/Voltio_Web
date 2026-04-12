@@ -19,6 +19,7 @@ export class ChatService {
   constructor(private http: HttpClient) {}
 
   conectar(): void {
+    if (this.socket?.connected) return;
     this.socket = io(environment.socketUrl, {
       auth: { token: localStorage.getItem('access_token') }
     });
@@ -114,6 +115,12 @@ export class ChatService {
   getConversacionesPorEmpresa(idEmpresa: number): Observable<Conversacion[]> {
     return this.http.get<Conversacion[]>(
       `${environment.apiUrl}/empresas/${idEmpresa}/conversaciones?t=${Date.now()}`
+    );
+  }
+
+  getConversacionesPorUsuario(idUsuario: number): Observable<Conversacion[]> {
+    return this.http.get<Conversacion[]>(
+      `${environment.apiUrl}/usuarios/${idUsuario}/conversaciones?t=${Date.now()}`
     );
   }
 

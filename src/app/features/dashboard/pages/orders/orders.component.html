@@ -1,122 +1,136 @@
 <div class="space-y-6">
-  <app-navbar 
-    pageTitle="PEDIDOS" 
-    pageSubtitle="Panel de vendedor">
+  <app-navbar
+    pageTitle="Pedidos"
+    pageSubtitle="Órdenes recibidas en tu empresa">
   </app-navbar>
 
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <div class="flex items-center gap-3 w-full sm:w-auto">
-      <div class="relative flex-1 sm:w-72">
-        <lucide-angular [img]="Search" [size]="18" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></lucide-angular>
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por cliente o # orden..."
-          class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white">
-      </div>
-
-      <select
-        [(ngModel)]="selectedStatus"
-        (ngModelChange)="onStatusChange()"
-        class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white text-gray-700">
-        <option *ngFor="let status of statuses" [value]="status">{{ getStatusLabel(status) }}</option>
-      </select>
-    </div>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 flex items-center justify-center">
+    <lucide-angular [img]="Loader" [size]="24" class="text-gray-400 animate-spin"></lucide-angular>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead>
-          <tr class="border-b border-gray-100 bg-gray-50">
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"># Orden</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Cliente</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Pago</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Dirección</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr *ngFor="let order of paginatedOrders" class="hover:bg-gray-50 transition-colors">
-            <td class="px-5 py-4">
-              <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">#{{ order.id_orden }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm font-medium text-gray-900">{{ order.usuario }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm text-gray-500">{{ order.fecha_orden }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-xs px-2.5 py-1 rounded-full font-medium" [ngClass]="getStatusClass(order.estado_orden)">
-                {{ getStatusLabel(order.estado_orden) }}
-              </span>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm font-semibold text-gray-900">${{ order.monto_total }} MXN</span>
-            </td>
-            <td class="px-5 py-4">
-              <div class="flex items-center gap-1.5">
-                <span class="text-sm text-gray-600 capitalize">{{ order.metodo_pago_tipo }}</span>
-                <span *ngIf="order.metodo_pago_ultimos4" class="text-xs text-gray-400">···· {{ order.metodo_pago_ultimos4 }}</span>
-              </div>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm text-gray-500 line-clamp-1 max-w-[160px]">{{ order.direccion }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <button 
-                (click)="viewOrder(order)"
-                class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver detalle">
-                <lucide-angular [img]="Eye" [size]="16" class="text-gray-500"></lucide-angular>
-              </button>
-            </td>
-          </tr>
+  <!-- Error -->
+  <div *ngIf="error && !isLoading"
+    class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-red-700 text-sm font-medium">
+    <lucide-angular [img]="AlertCircle" [size]="18" class="flex-shrink-0"></lucide-angular>
+    <span class="flex-1">{{ error }}</span>
+    <button (click)="cargarOrdenes()" class="underline hover:no-underline text-sm">Reintentar</button>
+  </div>
 
-          <tr *ngIf="paginatedOrders.length === 0">
-            <td colspan="8" class="px-5 py-12 text-center">
-              <div class="flex flex-col items-center gap-3">
-                <lucide-angular [img]="ShoppingBag" [size]="40" class="text-gray-300"></lucide-angular>
-                <p class="text-gray-500 text-sm">No se encontraron pedidos</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <ng-container *ngIf="!isLoading && !error">
 
-    <div class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-      <p class="text-xs text-gray-500">
-        Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}–{{ Math.min(currentPage * itemsPerPage, filteredOrders.length) }} de {{ filteredOrders.length }} pedido(s)
-      </p>
+    <!-- Barra de filtros -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-72">
+          <lucide-angular [img]="Search" [size]="18" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></lucide-angular>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por cliente o # orden..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white">
+        </div>
 
-      <div class="flex items-center gap-1">
-        <button
-          (click)="goToPage(currentPage - 1)"
-          [disabled]="currentPage === 1"
-          class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          <lucide-angular [img]="ChevronLeft" [size]="16" class="text-gray-600"></lucide-angular>
-        </button>
-
-        <button
-          *ngFor="let page of pages"
-          (click)="goToPage(page)"
-          class="w-8 h-8 rounded-lg text-xs font-medium transition-colors"
-          [ngClass]="page === currentPage ? 'bg-black text-white' : 'hover:bg-gray-200 text-gray-600'">
-          {{ page }}
-        </button>
-
-        <button
-          (click)="goToPage(currentPage + 1)"
-          [disabled]="currentPage === totalPages"
-          class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          <lucide-angular [img]="ChevronRight" [size]="16" class="text-gray-600"></lucide-angular>
-        </button>
+        <select
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="onStatusChange()"
+          class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white text-gray-700">
+          <option *ngFor="let status of statuses" [value]="status">{{ getStatusLabel(status) }}</option>
+        </select>
       </div>
     </div>
-  </div>
+
+    <!-- Tabla -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"># Orden</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Cliente</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Pago</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Dirección</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let order of paginatedOrders" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4">
+                <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">#{{ order.id_orden }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm font-medium text-gray-900">{{ order.usuario ?? order.email ?? '—' }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm text-gray-500">{{ formatFecha(order.fecha_orden) }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-xs px-2.5 py-1 rounded-full font-medium" [ngClass]="getStatusClass(order.estado_orden)">
+                  {{ getStatusLabel(order.estado_orden) }}
+                </span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm font-semibold text-gray-900">
+                  {{ order.monto_total | currency:'MXN':'symbol-narrow':'1.2-2' }}
+                </span>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm text-gray-600 capitalize">{{ order.metodo_pago_tipo }}</span>
+                  <span *ngIf="order.metodo_pago_ultimos4" class="text-xs text-gray-400">···· {{ order.metodo_pago_ultimos4 }}</span>
+                </div>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm text-gray-500 line-clamp-1 max-w-[160px]">{{ order.direccion }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <button
+                  (click)="viewOrder(order)"
+                  class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver detalle">
+                  <lucide-angular [img]="Eye" [size]="16" class="text-gray-500"></lucide-angular>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="paginatedOrders.length === 0">
+              <td colspan="8" class="px-5 py-12 text-center">
+                <div class="flex flex-col items-center gap-3">
+                  <lucide-angular [img]="ShoppingBag" [size]="40" class="text-gray-300"></lucide-angular>
+                  <p class="text-gray-500 text-sm">No se encontraron pedidos</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div *ngIf="filteredOrders.length > 0"
+        class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+        <p class="text-xs text-gray-500">
+          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}–{{ Math.min(currentPage * itemsPerPage, filteredOrders.length) }} de {{ filteredOrders.length }} pedido(s)
+        </p>
+        <div class="flex items-center gap-1">
+          <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+            class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            <lucide-angular [img]="ChevronLeft" [size]="16" class="text-gray-600"></lucide-angular>
+          </button>
+          <button *ngFor="let page of pages" (click)="goToPage(page)"
+            class="w-8 h-8 rounded-lg text-xs font-medium transition-colors"
+            [ngClass]="page === currentPage ? 'bg-black text-white' : 'hover:bg-gray-200 text-gray-600'">
+            {{ page }}
+          </button>
+          <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+            class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            <lucide-angular [img]="ChevronRight" [size]="16" class="text-gray-600"></lucide-angular>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
 </div>

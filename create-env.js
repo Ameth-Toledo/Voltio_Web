@@ -14,11 +14,13 @@ const socketUrl = process.env.SOCKET_URL || 'http://localhost:8080';
 const paypalClientId = process.env.PAYPAL_CLIENT_ID || '';
 const paypalCurrency = process.env.PAYPAL_CURRENCY || 'MXN';
 const paypalMode = process.env.PAYPAL_MODE || 'sandbox';
+const notificationsUrl = process.env.NOTIFICATIONS_URL || 'https://voltio-ws.ameth.shop';
 
 const envContent = `export const environment = {
   production: ${isProduction},
   apiUrl: '${apiUrl}',
   socketUrl: '${socketUrl}',
+  notificationsUrl: '${notificationsUrl}',
   paypal: {
     clientId: '${paypalClientId}',
     currency: '${paypalCurrency}',
@@ -33,3 +35,4 @@ console.log(`   Production: ${isProduction}`);
 console.log(`   API URL: ${apiUrl}`);
 console.log(`   Socket URL: ${socketUrl}`);
 console.log(`   PayPal mode: ${paypalMode}`);
+console.log(`   Notifications URL: ${notificationsUrl}`);

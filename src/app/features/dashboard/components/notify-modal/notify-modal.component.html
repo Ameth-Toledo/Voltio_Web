@@ -1,23 +1,23 @@
 <!-- Overlay -->
-<div 
+<div
   *ngIf="isOpen"
   class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
   (click)="close()">
 </div>
 
 <!-- Notifications Sidebar -->
-<div 
+<div
   class="fixed top-0 right-0 h-full w-full md:w-[420px] z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto"
   style="background-color: #CCDAFF;"
   [ngClass]="{
     'translate-x-full': !isOpen,
     'translate-x-0': isOpen
   }">
-  
+
   <div class="h-full flex flex-col">
     <div class="flex items-center justify-between p-6 border-b border-blue-200">
       <div class="flex items-center gap-3">
-        <button 
+        <button
           (click)="close()"
           class="p-1 hover:bg-white hover:bg-opacity-50 rounded-lg transition-colors">
           <lucide-icon [img]="ArrowLeft" [size]="20" class="text-gray-700"></lucide-icon>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="flex items-center gap-3 px-6 py-4 border-b border-blue-200">
-      <button 
+      <button
         *ngFor="let filter of filters"
         (click)="activeFilter = filter.id"
         class="px-4 py-1.5 text-sm rounded-full transition-colors"
@@ -48,18 +48,19 @@
     </div>
 
     <div class="flex-1 overflow-y-auto">
-      <div *ngFor="let notification of notifications" class="border-b border-blue-200">
+      <div *ngFor="let notification of notificacionesFiltradas" class="border-b border-blue-200">
         <div class="p-6 hover:bg-white hover:bg-opacity-40 transition-colors cursor-pointer">
           <div class="flex items-start gap-4">
             <div class="shrink-0">
               <div class="w-10 h-10 rounded-full flex items-center justify-center"
                 [ngClass]="{
                   'bg-green-500/20': notification.type === 'success',
-                  'bg-blue-500/20': notification.type === 'info',
+                  'bg-blue-500/20': notification.type === 'info' || notification.type === 'chat',
                   'bg-yellow-500/20': notification.type === 'warning',
                   'bg-red-500/20': notification.type === 'error'
                 }">
                 <lucide-icon *ngIf="notification.type === 'info'" [img]="Info" [size]="20" class="text-blue-500"></lucide-icon>
+                <lucide-icon *ngIf="notification.type === 'chat'" [img]="MessageCircle" [size]="20" class="text-blue-500"></lucide-icon>
                 <lucide-icon *ngIf="notification.type === 'success'" [img]="CheckCircle" [size]="20" class="text-green-500"></lucide-icon>
                 <lucide-icon *ngIf="notification.type === 'warning'" [img]="AlertTriangle" [size]="20" class="text-yellow-500"></lucide-icon>
                 <lucide-icon *ngIf="notification.type === 'error'" [img]="XCircle" [size]="20" class="text-red-500"></lucide-icon>
@@ -81,7 +82,7 @@
         </div>
       </div>
 
-      <div *ngIf="notifications.length === 0" class="flex flex-col items-center justify-center h-full py-12">
+      <div *ngIf="notificacionesFiltradas.length === 0" class="flex flex-col items-center justify-center h-full py-12">
         <lucide-icon [img]="BellOff" [size]="48" class="text-gray-400 mb-4"></lucide-icon>
         <p class="text-gray-600">No tienes notificaciones</p>
       </div>

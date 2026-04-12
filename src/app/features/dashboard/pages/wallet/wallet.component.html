@@ -1,0 +1,210 @@
+<div class="space-y-6">
+  <app-navbar pageTitle="Wallet" pageSubtitle="Saldo y retiros de tu empresa" />
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 flex items-center justify-center">
+      <lucide-icon [img]="Loader" size="24" class="text-gray-400 animate-spin" />
+    </div>
+  }
+
+  <!-- Error global -->
+  @if (error && !isLoading) {
+    <div class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-red-700 text-sm font-medium">
+      <lucide-icon [img]="AlertCircle" size="18" class="flex-shrink-0" />
+      <span class="flex-1">{{ error }}</span>
+      <button (click)="cargarDatos()" class="underline hover:no-underline text-sm">Reintentar</button>
+    </div>
+  }
+
+  <!-- Éxito -->
+  @if (successMsg) {
+    <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-5 py-4 text-green-700 text-sm font-medium">
+      <lucide-icon [img]="CheckCircle" size="18" class="flex-shrink-0" />
+      {{ successMsg }}
+    </div>
+  }
+
+  @if (wallet && !isLoading) {
+
+    <!-- ── Cards de saldo ─────────────────────────────────────────────── -->
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <p class="text-xs text-gray-400 mb-3">Disponible</p>
+        <p class="text-2xl font-bold text-gray-900">{{ formatPrecio(wallet.saldo_disponible) }}</p>
+        <p class="text-xs text-gray-400 mt-1">Listo para retirar</p>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <p class="text-xs text-gray-400 mb-3">En proceso</p>
+        <p class="text-2xl font-bold text-gray-900">{{ formatPrecio(wallet.saldo_retenido) }}</p>
+        <p class="text-xs text-gray-400 mt-1">Retiros en trámite</p>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <p class="text-xs text-gray-400 mb-3">Total ganado</p>
+        <p class="text-2xl font-bold text-gray-900">{{ formatPrecio(wallet.total_ganado) }}</p>
+        <p class="text-xs text-gray-400 mt-1">Acumulado histórico</p>
+      </div>
+    </div>
+
+    <!-- ── Historial + acción ─────────────────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+
+      <!-- Cabecera -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div>
+          <p class="text-sm font-semibold text-gray-800">Historial de retiros</p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ retiros.length }} solicitud{{ retiros.length !== 1 ? 'es' : '' }}</p>
+        </div>
+        <button
+          (click)="toggleFormRetiro()"
+          class="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          <lucide-icon [img]="ArrowDownCircle" size="15" />
+          Solicitar retiro
+        </button>
+      </div>
+
+      <!-- Formulario retiro -->
+      @if (mostrarFormRetiro) {
+        <div class="px-6 py-5 border-b border-gray-100 space-y-4 bg-gray-50">
+
+          @if (errorRetiro) {
+            <div class="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              <lucide-icon [img]="AlertCircle" size="15" class="flex-shrink-0" />
+              {{ errorRetiro }}
+            </div>
+          }
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Monto -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">Monto (MXN)</label>
+              <input
+                type="number"
+                [(ngModel)]="form.monto"
+                placeholder="Mínimo $100"
+                min="100"
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
+              />
+              <p class="text-xs text-gray-400 mt-1">Disponible: {{ formatPrecio(wallet.saldo_disponible) }}</p>
+            </div>
+
+            <!-- Método -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">Método</label>
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  (click)="form.metodo = 'transferencia'"
+                  [class]="'flex-1 py-2.5 rounded-lg border text-xs font-medium transition-colors ' +
+                    (form.metodo === 'transferencia' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400')"
+                >
+                  Transferencia
+                </button>
+                <button
+                  type="button"
+                  (click)="form.metodo = 'paypal'"
+                  [class]="'flex-1 py-2.5 rounded-lg border text-xs font-medium transition-colors ' +
+                    (form.metodo === 'paypal' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400')"
+                >
+                  PayPal
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Campos transferencia -->
+          @if (form.metodo === 'transferencia') {
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Banco</label>
+                <input type="text" [(ngModel)]="form.banco" placeholder="BBVA, Banorte..."
+                  class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Titular</label>
+                <input type="text" [(ngModel)]="form.titular" placeholder="Nombre completo"
+                  class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">CLABE (18 dígitos)</label>
+                <input type="text" [(ngModel)]="form.clabe" placeholder="000000000000000000" maxlength="18"
+                  class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition font-mono" />
+              </div>
+            </div>
+          }
+
+          <!-- Campos PayPal -->
+          @if (form.metodo === 'paypal') {
+            <div class="max-w-sm">
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">Correo de PayPal</label>
+              <input type="email" [(ngModel)]="form.paypal_email" placeholder="tu@correo.com"
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition" />
+            </div>
+          }
+
+          <div class="flex gap-2 pt-1">
+            <button
+              (click)="solicitarRetiro()"
+              [disabled]="isSolicitando"
+              class="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              @if (isSolicitando) {
+                <lucide-icon [img]="Loader" size="14" class="animate-spin" />
+                Enviando...
+              } @else {
+                <lucide-icon [img]="Send" size="14" />
+                Confirmar
+              }
+            </button>
+            <button
+              (click)="toggleFormRetiro()"
+              class="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Lista retiros -->
+      @if (retiros.length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 text-center text-gray-400">
+          <lucide-icon [img]="ArrowDownCircle" size="32" class="mb-3 text-gray-300" />
+          <p class="text-sm">Aún no has solicitado retiros</p>
+        </div>
+      }
+
+      @if (retiros.length > 0) {
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-400 border-b border-gray-100">
+              <th class="px-6 py-3 font-medium">Fecha</th>
+              <th class="px-6 py-3 font-medium">Método</th>
+              <th class="px-6 py-3 font-medium">Monto</th>
+              <th class="px-6 py-3 font-medium">Notas</th>
+              <th class="px-6 py-3 font-medium text-right">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            @for (retiro of retiros; track retiro.id_retiro) {
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 text-gray-500 text-xs">{{ formatFecha(retiro.created_at) }}</td>
+                <td class="px-6 py-4 text-gray-700 font-medium">{{ metodoLabel(retiro.metodo) }}</td>
+                <td class="px-6 py-4 font-semibold text-gray-900">{{ formatPrecio(retiro.monto) }}</td>
+                <td class="px-6 py-4 text-gray-400 text-xs max-w-xs truncate">{{ retiro.notas_admin || '—' }}</td>
+                <td class="px-6 py-4 text-right">
+                  <span [class]="'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ' + estadoBadge(retiro.estado)">
+                    {{ estadoLabel(retiro.estado) }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+  }
+
+</div>
