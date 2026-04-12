@@ -1,92 +1,106 @@
 <div class="space-y-6">
-  <app-navbar 
-    pageTitle="ESTADÍSTICAS" 
+  <app-navbar
+    pageTitle="ESTADÍSTICAS"
     pageSubtitle="Panel de vendedor">
   </app-navbar>
 
-  <!-- Stats cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500">Ventas totales</p>
-        <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-          <lucide-angular [img]="DollarSign" [size]="18" class="text-green-500"></lucide-angular>
-        </div>
-      </div>
-      <p class="text-2xl font-bold text-gray-900">$48.2K</p>
-      <p class="text-xs text-green-600 mt-1 font-medium">↑ +12.5% este mes</p>
-    </div>
-
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500">Pedidos</p>
-        <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-          <lucide-angular [img]="ShoppingCart" [size]="18" class="text-blue-500"></lucide-angular>
-        </div>
-      </div>
-      <p class="text-2xl font-bold text-gray-900">384</p>
-      <p class="text-xs text-green-600 mt-1 font-medium">↑ +8.2% este mes</p>
-    </div>
-
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500">Productos activos</p>
-        <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
-          <lucide-angular [img]="Package" [size]="18" class="text-purple-500"></lucide-angular>
-        </div>
-      </div>
-      <p class="text-2xl font-bold text-gray-900">12</p>
-      <p class="text-xs text-green-600 mt-1 font-medium">↑ +2 nuevos</p>
-    </div>
-
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500">Ticket promedio</p>
-        <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
-          <lucide-angular [img]="TrendingUp" [size]="18" class="text-yellow-500"></lucide-angular>
-        </div>
-      </div>
-      <p class="text-2xl font-bold text-gray-900">$125</p>
-      <p class="text-xs text-red-500 mt-1 font-medium">↓ -3.1% este mes</p>
-    </div>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 flex items-center justify-center">
+    <lucide-angular [img]="Loader" [size]="24" class="text-gray-400 animate-spin"></lucide-angular>
   </div>
 
-  <!-- Gráfica ventas por mes -->
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-    <h3 class="text-base font-semibold text-gray-900 mb-4">Ventas por mes</h3>
-    <div style="height: 280px;">
-      <canvas baseChart
-        [data]="salesChartData"
-        [options]="salesChartOptions"
-        type="line">
-      </canvas>
-    </div>
-  </div>
+  <ng-container *ngIf="!isLoading">
 
-  <!-- Gráficas inferiores -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Pedidos por estado -->
+    <!-- Stats cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm text-gray-500">Ventas totales</p>
+          <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+            <lucide-angular [img]="DollarSign" [size]="18" class="text-green-500"></lucide-angular>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ formatMoney(totalVentas) }}</p>
+        <p class="text-xs text-gray-400 mt-1">Pedidos completados</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm text-gray-500">Pedidos</p>
+          <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+            <lucide-angular [img]="ShoppingCart" [size]="18" class="text-blue-500"></lucide-angular>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ totalPedidos }}</p>
+        <p class="text-xs text-gray-400 mt-1">Total histórico</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm text-gray-500">Productos</p>
+          <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+            <lucide-angular [img]="Package" [size]="18" class="text-purple-500"></lucide-angular>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ totalProductos }}</p>
+        <p class="text-xs text-gray-400 mt-1">En catálogo</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm text-gray-500">Ticket promedio</p>
+          <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
+            <lucide-angular [img]="TrendingUp" [size]="18" class="text-yellow-500"></lucide-angular>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ formatMoney(ticketPromedio) }}</p>
+        <p class="text-xs text-gray-400 mt-1">Por pedido completado</p>
+      </div>
+    </div>
+
+    <!-- Gráfica ventas por mes -->
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <h3 class="text-base font-semibold text-gray-900 mb-4">Pedidos por estado</h3>
-      <div style="height: 260px;">
+      <h3 class="text-base font-semibold text-gray-900 mb-4">Ventas por mes ({{ salesChartData.labels?.length ? 'año actual' : '' }})</h3>
+      <div style="height: 280px;">
         <canvas baseChart
-          [data]="ordersChartData"
-          [options]="ordersChartOptions"
-          type="bar">
+          [data]="salesChartData"
+          [options]="salesChartOptions"
+          type="line">
         </canvas>
       </div>
     </div>
 
-    <!-- Ventas por categoría -->
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <h3 class="text-base font-semibold text-gray-900 mb-4">Ventas por categoría</h3>
-      <div style="height: 260px;">
-        <canvas baseChart
-          [data]="categoryChartData"
-          [options]="categoryChartOptions"
-          type="doughnut">
-        </canvas>
+    <!-- Gráficas inferiores -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Pedidos por estado -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h3 class="text-base font-semibold text-gray-900 mb-4">Pedidos por estado</h3>
+        <div style="height: 260px;">
+          <canvas baseChart
+            [data]="ordersChartData"
+            [options]="ordersChartOptions"
+            type="bar">
+          </canvas>
+        </div>
       </div>
+
+      <!-- Productos por categoría -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h3 class="text-base font-semibold text-gray-900 mb-4">Productos por categoría</h3>
+        <div *ngIf="categoryChartData.labels?.length === 0"
+          class="h-64 flex items-center justify-center text-sm text-gray-400">
+          Sin productos registrados
+        </div>
+        <div *ngIf="(categoryChartData.labels?.length ?? 0) > 0" style="height: 260px;">
+          <canvas baseChart
+            [data]="categoryChartData"
+            [options]="categoryChartOptions"
+            type="doughnut">
+          </canvas>
+        </div>
+      </div>
+
     </div>
-  </div>
+  </ng-container>
 </div>

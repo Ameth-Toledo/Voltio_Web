@@ -66,6 +66,11 @@ export const DASHBOARD_ROUTES: Routes = [
         title: 'Chat',
         loadComponent: () => import('./pages/chat/chat.component').then(m => m.ChatComponent)
       },
+      {
+        path: 'wallet',
+        title: 'Mi Wallet',
+        loadComponent: () => import('./pages/wallet/wallet.component').then(m => m.WalletComponent)
+      },
     ]
   }
 ];

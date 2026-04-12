@@ -5,37 +5,54 @@
   </div>
 
   <div class="flex items-center gap-4">
-    <button 
+    <!-- Campana de notificaciones -->
+    <button
       (click)="toggleNotifications()"
       class="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
       <lucide-icon [img]="Bell" [size]="24" class="text-gray-600"></lucide-icon>
-      <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+      <span *ngIf="unreadCount > 0"
+        class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full flex items-center justify-center"
+        style="background-color: #CCDAFF; color: #1e3a8a;">
+        {{ unreadCount > 99 ? '99+' : unreadCount }}
+      </span>
     </button>
 
+    <!-- Avatar + dropdown -->
     <div class="relative dropdown-container">
-      <button 
+      <button
         (click)="toggleDropdown()"
         class="flex items-center gap-2 hover:bg-gray-100 rounded-lg p-1.5 transition-colors">
-        <div class="w-10 h-10 rounded-full overflow-hidden" style="background-color: #CCDAFF;">
-          <img src="assets/ameth.png" alt="Profile" class="w-full h-full object-cover">
+        <!-- Avatar: foto real o iniciales -->
+        <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
+          <img
+            *ngIf="currentUser?.image_profile"
+            [src]="currentUser!.image_profile!"
+            alt="Perfil"
+            class="w-full h-full object-cover">
+          <span *ngIf="!currentUser?.image_profile" class="text-sm font-bold text-gray-600">
+            {{ initials }}
+          </span>
         </div>
-        <lucide-icon 
-          [img]="ChevronDown" 
-          [size]="20" 
+        <lucide-icon
+          [img]="ChevronDown"
+          [size]="20"
           class="text-gray-600"
           [ngClass]="{'rotate-180': isDropdownOpen}">
         </lucide-icon>
       </button>
 
-      <div 
+      <!-- Dropdown -->
+      <div
         *ngIf="isDropdownOpen"
         class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+
+        <!-- Nombre y email -->
         <div class="px-4 py-3 border-b border-gray-100">
-          <p class="text-sm font-semibold text-gray-900">Ameth Toledo</p>
-          <p class="text-xs text-gray-500 mt-1">ameth&#64;example.com</p>
+          <p class="text-sm font-semibold text-gray-900">{{ displayName }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ currentUser?.email }}</p>
         </div>
 
-        <button 
+        <button
           (click)="sendToProfile($event)"
           class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">
           <lucide-icon [img]="User" [size]="18" class="text-gray-500"></lucide-icon>
@@ -57,7 +74,9 @@
         </button>
 
         <div class="border-t border-gray-100 mt-2 pt-2">
-          <button class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors w-full text-left">
+          <button
+            (click)="logout($event)"
+            class="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors w-full text-left">
             <lucide-icon [img]="LogOut" [size]="18" class="text-red-400"></lucide-icon>
             <span class="text-sm text-red-400">Cerrar sesión</span>
           </button>
@@ -67,7 +86,8 @@
   </div>
 </header>
 
-<app-notify-modal 
-  [isOpen]="isNotificationsOpen" 
+<app-notify-modal
+  [isOpen]="isNotificationsOpen"
+  [notifications]="notifications"
   (closeModal)="closeNotifications()">
 </app-notify-modal>

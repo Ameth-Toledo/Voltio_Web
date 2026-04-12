@@ -1,38 +1,111 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavbarComponent } from "../../components/navbar/navbar.component";
-import { LucideAngularModule, Plus, Star, TrendingUp, Package, ShoppingCart } from 'lucide-angular';
-import { ProductCardComponent } from "../../components/product-card/product-card.component";
+import { RouterModule } from '@angular/router';
+import { NavbarComponent } from '../../components/navbar/navbar.component';
+import {
+  LucideAngularModule, Plus, Star, TrendingUp, Package, ShoppingCart, Loader
+} from 'lucide-angular';
+import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { ProductCard } from '../../models/ProductCard';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { AuthService } from '../../../auth/services/auth.service';
+import { ProductService } from '../../services/product.service';
+import { OrderService } from '../../services/order.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, LucideAngularModule, ProductCardComponent],
+  imports: [CommonModule, RouterModule, NavbarComponent, LucideAngularModule, ProductCardComponent],
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.css'
 })
-export class OverviewComponent {
-  userName = 'Ameth';
+export class OverviewComponent implements OnInit {
 
-  readonly Plus = Plus;
-  readonly Star = Star;
-  readonly TrendingUp = TrendingUp;
-  readonly Package = Package;
+  readonly Plus         = Plus;
+  readonly Star         = Star;
+  readonly TrendingUp   = TrendingUp;
+  readonly Package      = Package;
   readonly ShoppingCart = ShoppingCart;
+  readonly Loader       = Loader;
 
-  products: ProductCard[] = [
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'ESP32 DevKit v1', category: 'Microcontroladores', rating: '4.8' },
-    { imgSrc: 'assets/hardware/arduino.webp', name: 'Arduino Uno R3', category: 'Microcontroladores', rating: '4.9' },
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'Sensor DHT22 Temperatura y Humedad', category: 'Sensores', rating: '4.7' },
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'Sensor Ultrasónico HC-SR04', category: 'Sensores', rating: '4.6' },
-    { imgSrc: 'assets/hardware/capacitor.webp', name: 'Kit Resistencias 1/4W 600 piezas', category: 'Componentes', rating: '4.8' },
-    { imgSrc: 'assets/hardware/capacitor.webp', name: 'Capacitores Electrolíticos Kit 200pz', category: 'Componentes', rating: '4.7' },
-    { imgSrc: 'assets/hardware/cautin.webp', name: 'Soldador de Temperatura Variable 60W', category: 'Herramientas y Equipos', rating: '4.9' },
-    { imgSrc: 'assets/hardware/cautin.webp', name: 'Multímetro Digital DT830B', category: 'Herramientas y Equipos', rating: '4.8' },
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'Kit Iniciador Arduino Completo', category: 'Kits de Desarrollo', rating: '4.9' },
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'Kit IoT ESP32 con Sensores', category: 'Kits de Desarrollo', rating: '4.8' },
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'Brazo Robótico 4DOF Kit', category: 'Robótica', rating: '4.7' },
-    { imgSrc: 'assets/hardware/esp32.webp', name: 'Servo Motor SG90 Pack 5pz', category: 'Robótica', rating: '4.6' },
-  ];
+  // ── Estado ───────────────────────────────────────────────────────────────
+  isLoading   = true;
+  id_empresa: number | null = null;
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  userName      = '';
+  userPhoto     = '';
+  productCount  = 0;
+  orderCount   = 0;
+  totalVentas  = 0;
+
+  // ── Productos recientes (cards) ───────────────────────────────────────────
+  productCards: ProductCard[] = [];
+
+  constructor(
+    private authService:    AuthService,
+    private productService: ProductService,
+    private orderService:   OrderService,
+    private http:           HttpClient,
+  ) {}
+
+  ngOnInit(): void {
+    const user = this.authService.getUser();
+    if (user) {
+      this.userName  = user.name;
+      this.userPhoto = user.image_profile ?? '';
+    }
+    this.resolverEmpresa();
+  }
+
+  private resolverEmpresa(): void {
+    const user = this.authService.getUser();
+    if (!user) { this.isLoading = false; return; }
+
+    this.http.get<any>(`${environment.apiUrl}/usuarios/${user.id}/empresa`).subscribe({
+      next: (empresa) => {
+        this.id_empresa = empresa.id_empresa;
+        this.cargarDatos();
+      },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  private cargarDatos(): void {
+    if (!this.id_empresa) { this.isLoading = false; return; }
+
+    forkJoin({
+      products: this.productService.getByEmpresa(this.id_empresa),
+      orders:   this.orderService.getByEmpresa(this.id_empresa),
+    }).subscribe({
+      next: ({ products, orders }) => {
+        this.productCount = products.length;
+        this.orderCount   = orders.length;
+        this.totalVentas  = orders
+          .filter(o => o.estado_orden === 'completada')
+          .reduce((sum, o) => sum + o.monto_total, 0);
+
+        // Últimos 8 productos como cards
+        this.productCards = products.slice(0, 8).map(p => ({
+          productId: p.id_producto,
+          imgSrc:    p.imagen_url ?? '',
+          name:      p.nombre,
+          category:  p.categoria ?? '',
+          rating:    p.stock_actual > 0 ? `${p.stock_actual} en stock` : 'Sin stock',
+        }));
+
+        this.isLoading = false;
+      },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  formatVentas(): string {
+    if (this.totalVentas >= 1000) {
+      return `$${(this.totalVentas / 1000).toFixed(1)}K`;
+    }
+    return `$${this.totalVentas.toFixed(0)}`;
+  }
 }

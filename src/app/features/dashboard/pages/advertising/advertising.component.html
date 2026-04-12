@@ -6,6 +6,20 @@
 
   <app-banner></app-banner>
 
+  <!-- Error -->
+  <div *ngIf="error"
+    class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-red-700 text-sm font-medium">
+    <lucide-angular [img]="AlertCircle" [size]="18" class="flex-shrink-0"></lucide-angular>
+    {{ error }}
+  </div>
+
+  <!-- Éxito -->
+  <div *ngIf="successMsg"
+    class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-5 py-4 text-green-700 text-sm font-medium">
+    <lucide-angular [img]="CheckCircle" [size]="18" class="flex-shrink-0"></lucide-angular>
+    {{ successMsg }}
+  </div>
+
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-gray-900">Mis banners</h2>
@@ -27,32 +41,39 @@
     </p>
   </div>
 
-  @if (banners.length > 0) {
-    <div class="flex flex-col gap-4">
-    @for (banner of banners; track banner.id) {
-        <app-banner-card
-        [banner]="banner"
-        (toggleBanner)="toggleBanner($event)"
-        (deleteItem)="deleteBanner($event)">
-        </app-banner-card>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 flex items-center justify-center">
+    <lucide-angular [img]="Loader" [size]="24" class="text-gray-400 animate-spin"></lucide-angular>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    @if (banners.length > 0) {
+      <div class="flex flex-col gap-4">
+        @for (banner of banners; track banner.id) {
+          <app-banner-card
+            [banner]="banner"
+            (toggleBanner)="toggleBanner($event)"
+            (deleteItem)="deleteBanner($event)">
+          </app-banner-card>
+        }
+      </div>
+    } @else {
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-16 flex flex-col items-center gap-4">
+        <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center">
+          <lucide-angular [img]="ImageOff" [size]="32" class="text-gray-300"></lucide-angular>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-900 font-medium">No tienes banners todavía</p>
+          <p class="text-sm text-gray-500 mt-1">Sube tu primer banner para comenzar</p>
+        </div>
+        <button (click)="openUploadModal()"
+          class="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors">
+          <lucide-angular [img]="Plus" [size]="18"></lucide-angular>
+          Subir banner
+        </button>
+      </div>
     }
-    </div>
-  } @else {
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-16 flex flex-col items-center gap-4">
-      <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center">
-        <lucide-angular [img]="Image" [size]="32" class="text-gray-300"></lucide-angular>
-      </div>
-      <div class="text-center">
-        <p class="text-gray-900 font-medium">No tienes banners todavía</p>
-        <p class="text-sm text-gray-500 mt-1">Sube tu primer banner para comenzar</p>
-      </div>
-      <button (click)="openUploadModal()"
-        class="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors">
-        <lucide-angular [img]="Plus" [size]="18"></lucide-angular>
-        Subir banner
-      </button>
-    </div>
-  }
+  </ng-container>
 </div>
 
 @if (showUploadModal) {
@@ -67,6 +88,13 @@
       </button>
 
       <h3 class="text-lg font-semibold text-gray-900 mb-6">Subir nuevo banner</h3>
+
+      <!-- Error en modal -->
+      <div *ngIf="error"
+        class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm mb-4">
+        <lucide-angular [img]="AlertCircle" [size]="15" class="shrink-0"></lucide-angular>
+        {{ error }}
+      </div>
 
       <label class="block cursor-pointer mb-5">
         <div class="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center gap-3 hover:border-gray-400 hover:bg-gray-50 transition-all">
@@ -88,27 +116,28 @@
 
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre del banner</label>
-        <input type="text" placeholder="Ej. Promo verano ESP32"
+        <input type="text" [(ngModel)]="form.nombre" placeholder="Ej. Promo verano ESP32"
           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400">
       </div>
 
       <div class="grid grid-cols-2 gap-3 mb-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Fecha inicio</label>
-          <input type="date"
+          <input type="date" [(ngModel)]="form.fecha_inicio"
             class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Fecha fin</label>
-          <input type="date"
+          <input type="date" [(ngModel)]="form.fecha_fin"
             class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400">
         </div>
       </div>
 
-      <button [disabled]="!selectedFile"
+      <button (click)="subirBanner()" [disabled]="!selectedFile || isSaving"
         class="w-full py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-        <lucide-angular [img]="Upload" [size]="16"></lucide-angular>
-        Subir banner
+        <lucide-angular *ngIf="isSaving"  [img]="Loader" [size]="16" class="animate-spin"></lucide-angular>
+        <lucide-angular *ngIf="!isSaving" [img]="Upload" [size]="16"></lucide-angular>
+        {{ isSaving ? 'Subiendo...' : 'Subir banner' }}
       </button>
     </div>
   </div>

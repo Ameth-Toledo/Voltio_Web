@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { ChatService } from '../../services/chat.service';
 import { Conversacion, Mensaje } from '../../models/chat.models';
@@ -45,11 +46,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private shouldScroll = false;
   private destroy$ = new Subject<void>();
   private typingSubject$ = new Subject<void>();
+  private idConversacionInicial: number | null = null;
 
   constructor(
     private chatService: ChatService,
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private route: ActivatedRoute,
   ) {}
 
   get conversacionesFiltradas(): Conversacion[] {
@@ -60,10 +63,23 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnInit(): void {
+    // Capturar ?id_conversacion=X antes de cargar (retorno desde pago de asesoría)
+    this.route.queryParams.subscribe(params => {
+      if (params['id_conversacion']) {
+        this.idConversacionInicial = Number(params['id_conversacion']);
+      }
+    });
+
     const user = this.authService.getUser();
     if (user) {
       this.idUsuario = user.id;
-      this.obtenerEmpresa(user.id);
+      // Empresas: cargar sus conversaciones por empresa
+      // Usuarios normales: cargar sus conversaciones por usuario
+      if (user.role === 'user') {
+        this.cargarConversacionesUsuario(user.id);
+      } else {
+        this.obtenerEmpresa(user.id);
+      }
     }
 
     this.chatService.conectar();
@@ -118,7 +134,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.chatService.desconectar();
   }
 
   ngAfterViewChecked(): void {
@@ -150,9 +165,33 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       next: (data) => {
         this.conversaciones = data;
         this.isLoadingConversaciones = false;
+        this.abrirConversacionInicial();
       },
       error: () => { this.isLoadingConversaciones = false; }
     });
+  }
+
+  cargarConversacionesUsuario(idUsuario: number): void {
+    this.isLoadingConversaciones = true;
+    this.chatService.getConversacionesPorUsuario(idUsuario).subscribe({
+      next: (data) => {
+        this.conversaciones = data;
+        this.isLoadingConversaciones = false;
+        this.abrirConversacionInicial();
+      },
+      error: () => { this.isLoadingConversaciones = false; }
+    });
+  }
+
+  private abrirConversacionInicial(): void {
+    if (!this.idConversacionInicial) return;
+    const conv = this.conversaciones.find(
+      c => c.id_conversacion === this.idConversacionInicial
+    );
+    if (conv) {
+      this.seleccionarConversacion(conv);
+    }
+    this.idConversacionInicial = null;
   }
 
   seleccionarConversacion(conv: Conversacion): void {

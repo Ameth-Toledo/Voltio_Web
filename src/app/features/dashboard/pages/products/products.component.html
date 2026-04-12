@@ -1,137 +1,278 @@
 <div class="space-y-6">
-  <app-navbar 
-    pageTitle="PRODUCTOS" 
-    pageSubtitle="Panel de vendedor">
+  <app-navbar
+    pageTitle="Productos"
+    pageSubtitle="Gestiona el catálogo de tu empresa">
   </app-navbar>
 
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <div class="flex items-center gap-3 w-full sm:w-auto">
-      <div class="relative flex-1 sm:w-72">
-        <lucide-angular [img]="Search" [size]="18" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></lucide-angular>
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por nombre o SKU..."
-          class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white">
-      </div>
-
-      <select
-        [(ngModel)]="selectedCategory"
-        (ngModelChange)="onCategoryChange()"
-        class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white text-gray-700">
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
-    </div>
-
-    <button class="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors whitespace-nowrap">
-      <lucide-angular [img]="Plus" [size]="18"></lucide-angular>
-      Agregar producto
-    </button>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 flex items-center justify-center">
+    <lucide-angular [img]="Loader" [size]="24" class="text-gray-400 animate-spin"></lucide-angular>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead>
-          <tr class="border-b border-gray-100 bg-gray-50">
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Producto</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">SKU</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Categoría</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Precio</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Stock</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Registro</th>
-            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr *ngFor="let product of paginatedProducts" class="hover:bg-gray-50 transition-colors">
-            <td class="px-5 py-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                  <img [src]="product.imagen_url" [alt]="product.nombre" class="w-full h-full object-cover">
-                </div>
-                <span class="text-sm font-medium text-gray-900 line-clamp-1">{{ product.nombre }}</span>
-              </div>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">{{ product.sku }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm text-gray-600">{{ product.categoria }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm font-semibold text-gray-900">${{ product.precio_venta }} MXN</span>
-            </td>
-            <td class="px-5 py-4">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-gray-900">{{ product.stock_actual }}</span>
-                <span class="text-xs px-2 py-0.5 rounded-full font-medium" [ngClass]="getStockClass(product.stock_actual)">
-                  {{ getStockLabel(product.stock_actual) }}
-                </span>
-              </div>
-            </td>
-            <td class="px-5 py-4">
-              <span class="text-sm text-gray-500">{{ product.fecha_registro }}</span>
-            </td>
-            <td class="px-5 py-4">
-              <div class="flex items-center gap-2">
-                <button 
-                  (click)="viewProduct(product)"
-                  class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver">
-                  <lucide-angular [img]="Eye" [size]="16" class="text-gray-500"></lucide-angular>
-                </button>
-                <button class="p-1.5 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
-                  <lucide-angular [img]="Edit" [size]="16" class="text-blue-500"></lucide-angular>
-                </button>
-                <button class="p-1.5 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
-                  <lucide-angular [img]="Trash2" [size]="16" class="text-red-400"></lucide-angular>
-                </button>
-              </div>
-            </td>
-          </tr>
+  <!-- Error global -->
+  <div *ngIf="error && !isLoading"
+    class="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-red-700 text-sm font-medium">
+    <lucide-angular [img]="AlertCircle" [size]="18" class="flex-shrink-0"></lucide-angular>
+    <span class="flex-1">{{ error }}</span>
+    <button (click)="cargarDatos()" class="underline hover:no-underline text-sm">Reintentar</button>
+  </div>
 
-          <tr *ngIf="paginatedProducts.length === 0">
-            <td colspan="7" class="px-5 py-12 text-center">
-              <div class="flex flex-col items-center gap-3">
-                <lucide-angular [img]="Package" [size]="40" class="text-gray-300"></lucide-angular>
-                <p class="text-gray-500 text-sm">No se encontraron productos</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Éxito -->
+  <div *ngIf="successMsg"
+    class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-5 py-4 text-green-700 text-sm font-medium">
+    <lucide-angular [img]="CheckCircle" [size]="18" class="flex-shrink-0"></lucide-angular>
+    {{ successMsg }}
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error">
+
+    <!-- Barra de búsqueda y filtro -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-72">
+          <lucide-angular [img]="Search" [size]="18" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></lucide-angular>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por nombre o SKU..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white">
+        </div>
+
+        <select
+          [(ngModel)]="selectedCategoriaId"
+          (ngModelChange)="onCategoryChange()"
+          class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400 bg-white text-gray-700">
+          <option [ngValue]="null">Todas las categorías</option>
+          <option *ngFor="let cat of categorias" [ngValue]="cat.id_categoria">{{ cat.nombre_categoria }}</option>
+        </select>
+      </div>
+
+      <button
+        (click)="abrirModal()"
+        class="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors whitespace-nowrap">
+        <lucide-angular [img]="Plus" [size]="18"></lucide-angular>
+        Agregar producto
+      </button>
     </div>
 
-    <!-- Footer con paginación -->
-    <div class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-      <p class="text-xs text-gray-500">
-        Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}–{{ Math.min(currentPage * itemsPerPage, filteredProducts.length) }} de {{ filteredProducts.length }} producto(s)
-      </p>
+    <!-- Tabla -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Producto</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">SKU</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Categoría</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Precio</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Stock</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Registro</th>
+              <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let product of paginatedProducts" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                    <img *ngIf="product.imagen_url; else noImg" [src]="product.imagen_url" [alt]="product.nombre" class="w-full h-full object-cover">
+                    <ng-template #noImg>
+                      <lucide-angular [img]="ImageOff" [size]="18" class="text-gray-300"></lucide-angular>
+                    </ng-template>
+                  </div>
+                  <span class="text-sm font-medium text-gray-900 line-clamp-1">{{ product.nombre }}</span>
+                </div>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">{{ product.sku }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm text-gray-600">{{ getCategoriaName(product.id_categoria) }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm font-semibold text-gray-900">
+                  {{ product.precio_venta | currency:'MXN':'symbol-narrow':'1.2-2' }}
+                </span>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-gray-900">{{ product.stock_actual }}</span>
+                  <span class="text-xs px-2 py-0.5 rounded-full font-medium" [ngClass]="getStockClass(product.stock_actual)">
+                    {{ getStockLabel(product.stock_actual) }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm text-gray-500">{{ formatFecha(product.fecha_registro) }}</span>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2">
+                  <button
+                    (click)="router.navigate(['/dashboard/products', product.id_producto])"
+                    class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Ver detalle">
+                    <lucide-angular [img]="Eye" [size]="16" class="text-gray-500"></lucide-angular>
+                  </button>
+                  <button
+                    (click)="abrirModal(product)"
+                    class="p-1.5 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
+                    <lucide-angular [img]="Edit" [size]="16" class="text-blue-500"></lucide-angular>
+                  </button>
+                  <button
+                    (click)="eliminarProducto(product)"
+                    [disabled]="deletingId === product.id_producto"
+                    class="p-1.5 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40" title="Eliminar">
+                    <lucide-angular
+                      [img]="deletingId === product.id_producto ? Loader : Trash2"
+                      [size]="16"
+                      [class]="deletingId === product.id_producto ? 'text-gray-400 animate-spin' : 'text-red-400'">
+                    </lucide-angular>
+                  </button>
+                </div>
+              </td>
+            </tr>
 
-      <div class="flex items-center gap-1">
-        <button
-          (click)="goToPage(currentPage - 1)"
-          [disabled]="currentPage === 1"
-          class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          <lucide-angular [img]="ChevronLeft" [size]="16" class="text-gray-600"></lucide-angular>
-        </button>
-
-        <button
-          *ngFor="let page of pages"
-          (click)="goToPage(page)"
-          class="w-8 h-8 rounded-lg text-xs font-medium transition-colors"
-          [ngClass]="page === currentPage ? 'bg-black text-white' : 'hover:bg-gray-200 text-gray-600'">
-          {{ page }}
-        </button>
-
-        <button
-          (click)="goToPage(currentPage + 1)"
-          [disabled]="currentPage === totalPages"
-          class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-          <lucide-angular [img]="ChevronRight" [size]="16" class="text-gray-600"></lucide-angular>
-        </button>
+            <tr *ngIf="paginatedProducts.length === 0">
+              <td colspan="7" class="px-5 py-12 text-center">
+                <div class="flex flex-col items-center gap-3">
+                  <lucide-angular [img]="Package" [size]="40" class="text-gray-300"></lucide-angular>
+                  <p class="text-gray-500 text-sm">No se encontraron productos</p>
+                  <button (click)="abrirModal()"
+                    class="mt-1 px-4 py-2 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors">
+                    Agregar tu primer producto
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      <!-- Paginación -->
+      <div *ngIf="filteredProducts.length > 0"
+        class="px-5 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+        <p class="text-xs text-gray-500">
+          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}–{{ Math.min(currentPage * itemsPerPage, filteredProducts.length) }} de {{ filteredProducts.length }} producto(s)
+        </p>
+        <div class="flex items-center gap-1">
+          <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+            class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            <lucide-angular [img]="ChevronLeft" [size]="16" class="text-gray-600"></lucide-angular>
+          </button>
+          <button *ngFor="let page of pages" (click)="goToPage(page)"
+            class="w-8 h-8 rounded-lg text-xs font-medium transition-colors"
+            [ngClass]="page === currentPage ? 'bg-black text-white' : 'hover:bg-gray-200 text-gray-600'">
+            {{ page }}
+          </button>
+          <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+            class="p-1.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            <lucide-angular [img]="ChevronRight" [size]="16" class="text-gray-600"></lucide-angular>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
+
+<!-- ── Modal crear / editar producto ──────────────────────────────────────── -->
+<div *ngIf="showModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
+    <!-- Cabecera -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900">
+        {{ editingProduct ? 'Editar producto' : 'Nuevo producto' }}
+      </h2>
+      <button (click)="cerrarModal()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <lucide-angular [img]="X" [size]="18" class="text-gray-500"></lucide-angular>
+      </button>
+    </div>
+
+    <!-- Cuerpo -->
+    <div class="px-6 py-5 space-y-4">
+
+      <!-- Error modal -->
+      <div *ngIf="errorModal"
+        class="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+        <lucide-angular [img]="AlertCircle" [size]="15" class="flex-shrink-0"></lucide-angular>
+        {{ errorModal }}
+      </div>
+
+      <!-- Imagen -->
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1.5">Imagen del producto</label>
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <img *ngIf="imagenPreview" [src]="imagenPreview" alt="Vista previa del producto" class="w-full h-full object-cover">
+            <lucide-angular *ngIf="!imagenPreview" [img]="ImageOff" [size]="24" class="text-gray-300"></lucide-angular>
+          </div>
+          <label class="flex-1 cursor-pointer">
+            <div class="border border-dashed border-gray-300 rounded-xl px-4 py-3 text-center hover:border-gray-400 transition-colors">
+              <p class="text-xs text-gray-500">Haz clic para seleccionar imagen</p>
+              <p class="text-xs text-gray-400 mt-0.5">JPG, PNG, WEBP</p>
+            </div>
+            <input type="file" accept="image/*" (change)="onFileChange($event)" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <!-- Nombre y SKU -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">Nombre *</label>
+          <input type="text" [(ngModel)]="form.nombre" placeholder="Nombre del producto"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">SKU *</label>
+          <input type="text" [(ngModel)]="form.sku" placeholder="MCU-001"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition">
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1.5">Descripción</label>
+        <textarea [(ngModel)]="form.descripcion" rows="2" placeholder="Descripción del producto..."
+          class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"></textarea>
+      </div>
+
+      <!-- Precio, stock y categoría -->
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">Precio (MXN) *</label>
+          <input type="number" [(ngModel)]="form.precio_venta" placeholder="0.00" min="0" step="0.01"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">Stock</label>
+          <input type="number" [(ngModel)]="form.stock_actual" placeholder="0" min="0"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">Categoría</label>
+          <select [(ngModel)]="form.id_categoria"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition bg-white">
+            <option [ngValue]="null">Sin categoría</option>
+            <option *ngFor="let cat of categorias" [ngValue]="cat.id_categoria">{{ cat.nombre_categoria }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie -->
+    <div class="px-6 py-4 border-t border-gray-100 flex gap-2 justify-end">
+      <button (click)="cerrarModal()"
+        class="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors">
+        Cancelar
+      </button>
+      <button (click)="guardarProducto()" [disabled]="isSaving"
+        class="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <lucide-angular *ngIf="isSaving" [img]="Loader" [size]="14" class="animate-spin"></lucide-angular>
+        {{ isSaving ? 'Guardando...' : (editingProduct ? 'Guardar cambios' : 'Crear producto') }}
+      </button>
     </div>
   </div>
 </div>

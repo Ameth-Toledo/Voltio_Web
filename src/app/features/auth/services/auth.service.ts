@@ -39,14 +39,13 @@ export class AuthService {
       );
   }
 
-  logout(): Observable<{ message: string }> {
-    return this.http
-      .post<{ message: string }>(
-        `${this.base}/logout`,
-        {},
-        { withCredentials: true }
-      )
-      .pipe(tap(() => this.clearSession()));
+  logout(): void {
+    // Limpia la sesión local de inmediato (no espera al servidor)
+    this.clearSession();
+    // Llama al backend en segundo plano solo para borrar la cookie
+    this.http
+      .post<{ message: string }>(`${this.base}/logout`, {}, { withCredentials: true })
+      .subscribe({ error: () => {} }); // silencioso — la sesión ya fue limpiada
   }
 
   getToken(): string | null {

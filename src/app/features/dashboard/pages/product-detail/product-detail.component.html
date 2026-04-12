@@ -1,6 +1,19 @@
-<div class="space-y-6" *ngIf="product">
-  <app-navbar 
-    [pageTitle]="product.nombre" 
+<!-- Loading -->
+<div *ngIf="isLoading" class="bg-white rounded-xl border border-gray-200 shadow-sm p-10 flex items-center justify-center mt-6">
+  <lucide-angular [img]="Loader" [size]="24" class="text-gray-400 animate-spin"></lucide-angular>
+</div>
+
+<!-- Error -->
+<div *ngIf="error && !isLoading"
+  class="mt-6 flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-red-700 text-sm font-medium">
+  <lucide-angular [img]="AlertCircle" [size]="18" class="flex-shrink-0"></lucide-angular>
+  {{ error }}
+  <button (click)="goBack()" class="ml-auto underline">Volver a productos</button>
+</div>
+
+<div class="space-y-6" *ngIf="product && !isLoading">
+  <app-navbar
+    [pageTitle]="product.nombre"
     pageSubtitle="Detalle de producto">
   </app-navbar>
 
@@ -12,32 +25,36 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+    <!-- Imagen -->
     <div class="space-y-4">
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div class="aspect-square bg-gray-50 flex items-center justify-center p-8">
-          <img [src]="product.imagen_url" [alt]="product.nombre" class="w-full h-full object-contain">
+          <img *ngIf="product.imagen_url" [src]="product.imagen_url" [alt]="product.nombre"
+            class="w-full h-full object-contain">
+          <span *ngIf="!product.imagen_url" class="text-gray-300 text-sm">Sin imagen</span>
         </div>
       </div>
 
       <div class="flex gap-3">
-        <button class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors">
+        <button (click)="goBack()"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-sm font-medium transition-colors">
           <lucide-angular [img]="Edit" [size]="16"></lucide-angular>
           Editar
-        </button>
-        <button class="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-sm font-medium transition-colors">
-          <lucide-angular [img]="Trash2" [size]="16"></lucide-angular>
-          Eliminar
         </button>
       </div>
     </div>
 
+    <!-- Info -->
     <div class="lg:col-span-2 space-y-4">
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div class="flex items-start justify-between mb-4">
           <div>
             <div class="flex items-center gap-2 mb-2">
               <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded-md">{{ product.sku }}</span>
-              <span class="text-xs px-2.5 py-1 rounded-full font-medium bg-blue-50 text-blue-600">{{ product.categoria }}</span>
+              <span *ngIf="product.categoria"
+                class="text-xs px-2.5 py-1 rounded-full font-medium bg-blue-50 text-blue-600">
+                {{ product.categoria }}
+              </span>
             </div>
             <h2 class="text-2xl font-bold text-gray-900">{{ product.nombre }}</h2>
           </div>
@@ -46,28 +63,32 @@
           </span>
         </div>
 
-        <p class="text-sm text-gray-600 leading-relaxed mb-6">{{ product.descripcion }}</p>
+        <p *ngIf="product.descripcion" class="text-sm text-gray-600 leading-relaxed mb-6">
+          {{ product.descripcion }}
+        </p>
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="bg-gray-50 rounded-xl p-4">
             <p class="text-xs text-gray-400 mb-1">Precio</p>
             <p class="text-xl font-bold text-gray-900">${{ product.precio_venta }}</p>
             <p class="text-xs text-gray-400">MXN</p>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-4">
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
             <p class="text-xs text-gray-400 mb-1">Stock</p>
             <p class="text-xl font-bold text-gray-900">{{ product.stock_actual }}</p>
             <p class="text-xs text-gray-400">unidades</p>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-4">
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
             <p class="text-xs text-gray-400 mb-1">Categoría</p>
-            <p class="text-sm font-bold text-gray-900">{{ product.categoria }}</p>
+            <p class="text-sm font-bold text-gray-900">{{ product.categoria ?? '—' }}</p>
             <p class="text-xs text-gray-400">{{ product.sku }}</p>
-        </div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <!-- Especificaciones -->
+      <div *ngIf="product.especificaciones && product.especificaciones.length > 0"
+        class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <h3 class="text-base font-semibold text-gray-900 mb-4">Especificaciones</h3>
         <div class="divide-y divide-gray-100">
           @for (spec of product.especificaciones; track spec.clave) {
@@ -79,12 +100,13 @@
         </div>
       </div>
 
+      <!-- Info adicional -->
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <h3 class="text-base font-semibold text-gray-900 mb-4">Información adicional</h3>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <p class="text-xs text-gray-400 mb-1">Fecha de registro</p>
-            <p class="text-sm font-medium text-gray-900">{{ product.fecha_registro }}</p>
+            <p class="text-sm font-medium text-gray-900">{{ formatFecha(product.fecha_registro) }}</p>
           </div>
           <div>
             <p class="text-xs text-gray-400 mb-1">ID de producto</p>
@@ -92,7 +114,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>

@@ -54,13 +54,14 @@
   </div>
 
   <div class="mt-auto space-y-2">
-    <a href="#" class="flex items-center gap-2 py-2 px-2 rounded-lg hover:bg-white hover:bg-opacity-50 transition-colors">
-      <div class="h-7 w-7 shrink-0 rounded-full overflow-hidden" style="background-color: #22c55e;">
-        <img src="assets/ameth.png" class="h-full w-full object-cover" alt="Avatar">
+    <a routerLink="/dashboard/profile" (click)="closeMobileMenu()" class="flex items-center gap-2 py-2 px-2 rounded-lg hover:bg-white hover:bg-opacity-50 transition-colors">
+      <div class="h-7 w-7 shrink-0 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center">
+        <img *ngIf="currentUser?.image_profile" [src]="currentUser!.image_profile!" class="h-full w-full object-cover" alt="Avatar">
+        <span *ngIf="!currentUser?.image_profile" class="text-xs font-bold text-gray-600">{{ initials }}</span>
       </div>
-      <span class="text-gray-900 text-sm">Ameth Toledo</span>
+      <span class="text-gray-900 text-sm">{{ displayName }}</span>
     </a>
-    <button class="flex items-center gap-2 py-2 px-2 rounded-lg hover:bg-white hover:bg-opacity-50 transition-colors w-full">
+    <button (click)="logout()" class="flex items-center gap-2 py-2 px-2 rounded-lg hover:bg-white hover:bg-opacity-50 transition-colors w-full">
       <svg class="h-5 w-5 shrink-0 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
       </svg>
@@ -123,7 +124,8 @@
     </div>
 
     <div class="px-3 space-y-1">
-      <button 
+      <button
+        (click)="logout()"
         class="flex items-center gap-3 group/sidebar py-3 rounded-xl hover:bg-white hover:bg-opacity-50 transition-all w-full"
         [ngClass]="{
           'justify-center': !isOpen(),
@@ -132,7 +134,7 @@
         <svg class="h-6 w-6 shrink-0 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
-        <span 
+        <span
           class="text-gray-900 text-sm font-medium group-hover/sidebar:translate-x-1 transition-all duration-150 whitespace-pre overflow-hidden"
           [ngClass]="{
             'opacity-0 w-0': !isOpen(),
