@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule, Eye, EyeOff, LogIn } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 
@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   showPassword = false;
   isLoading = false;
   errorMessage = '';
@@ -22,16 +22,23 @@ export class LoginComponent {
   readonly LogIn = LogIn;
 
   readonly form;
+  private returnUrl = '/dashboard';
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+  }
+
+  ngOnInit(): void {
+    // Recuperar la URL de retorno si viene desde el guard del chat u otra ruta protegida
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
   }
 
   togglePassword(): void {
@@ -56,7 +63,7 @@ export class LoginComponent {
 
     this.authService.login(email!, password!).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: (err) => {
         this.errorMessage = err.error?.error ?? 'Error al iniciar sesión';

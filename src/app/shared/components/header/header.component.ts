@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,14 +13,12 @@ import { Subscription } from 'rxjs';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements AfterViewInit, OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy {
   readonly Menu = Menu;
   readonly X = X;
   readonly Search = Search;
   readonly Heart = Heart;
   readonly ArrowRight = ArrowRight;
-
-  @ViewChild('headerNav') headerNav!: ElementRef;
 
   scrollY = 0;
   searchQuery = '';
@@ -31,7 +29,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
 
   constructor(private router: Router) {}
 
-  ngAfterViewInit() {
+  ngOnInit() {                          
     this.currentRoute = this.router.url;
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
