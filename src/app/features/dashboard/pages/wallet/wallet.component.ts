@@ -107,9 +107,20 @@ export class WalletComponent implements OnInit {
         this.cargarRetiros();
       },
       error: (err) => {
-        console.error('[Wallet] Error cargando wallet:', err);
-        this.error     = `Error al cargar el wallet (${err.status}: ${err.error?.error ?? err.message})`;
-        this.isLoading = false;
+        if (err.status === 404) {
+          this.wallet = {
+            id_wallet:        0,
+            id_empresa:       this.id_empresa!,
+            saldo_disponible: 0,
+            saldo_retenido:   0,
+            total_ganado:     0,
+            updated_at:       new Date().toISOString(),
+          } as WalletModel;
+          this.isLoading = false;
+        } else {
+          this.error = `Error al cargar el wallet (${err.status}: ${err.error?.error ?? err.message})`;
+          this.isLoading = false;
+        }
       }
     });
   }

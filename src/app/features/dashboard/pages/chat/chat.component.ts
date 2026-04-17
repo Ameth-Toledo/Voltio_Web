@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { ChatService } from '../../services/chat.service';
 import { Conversacion, Mensaje } from '../../models/chat.models';
@@ -53,6 +53,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private authService: AuthService,
     private http: HttpClient,
     private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   get conversacionesFiltradas(): Conversacion[] {
@@ -71,15 +72,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
 
     const user = this.authService.getUser();
-    if (user) {
-      this.idUsuario = user.id;
-      // Empresas: cargar sus conversaciones por empresa
-      // Usuarios normales: cargar sus conversaciones por usuario
-      if (user.role === 'user') {
-        this.cargarConversacionesUsuario(user.id);
-      } else {
-        this.obtenerEmpresa(user.id);
-      }
+
+    // Si no hay sesión activa (usuario llegó desde PayPal sin estar logueado),
+    // guardar la URL completa y redirigir al login para que vuelva aquí después.
+    if (!user) {
+      const returnUrl = this.router.url;
+      this.router.navigate(['/login'], { queryParams: { returnUrl } });
+      return;
+    }
+
+    this.idUsuario = user.id;
+    // Empresas: cargar sus conversaciones por empresa
+    // Usuarios normales: cargar sus conversaciones por usuario
+    if (user.role === 'user') {
+      this.cargarConversacionesUsuario(user.id);
+    } else {
+      this.obtenerEmpresa(user.id);
     }
 
     this.chatService.conectar();
